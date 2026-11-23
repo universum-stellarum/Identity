@@ -42,7 +42,7 @@ public class SecurityConfig {
             CorsConfigurationSource corsConfigurationSource, RateLimitingFilter rateLimitingFilter) {
         statelessApi(http, corsConfigurationSource, rateLimitingFilter)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.GET, "/.well-known/jwks.json", "/health", "/actuator/health",
+                        .requestMatchers(HttpMethod.GET, "/.well-known/jwks.json", "/health", "/healthz", "/actuator/health",
                                 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/actuator/**").denyAll()
                         .anyRequest().authenticated())
