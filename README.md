@@ -58,10 +58,11 @@ Os valores específicos de cada ambiente vêm do Config Server (Aldebaran). A ap
 | `APP_ENV` | Perfil Spring: `dev` ou `prod` |
 | `CONFIG_SERVER_URL` | URL base do Config Server, por exemplo `http://config-server:8888` na rede do ambiente |
 
-No repositório de configurações, o arquivo `antares-<perfil>.yaml` precisa definir, entre outros:
+No repositório de configurações, o arquivo `identity-<perfil>.yaml` precisa definir, entre outros:
 
 - `app.jwt.issuer`: emissor dos tokens. Deve coincidir com o `issuer-uri` configurado no gateway.
 - `app.jwt.audience`: público dos tokens. Deve coincidir com `gateway.security.jwt-audience` no gateway.
+- `app.cors.allowed-origins`: origens do frontend aceitas pelo CORS, separadas por vírgula. Não há variável de ambiente para isso.
 - Conexão com PostgreSQL e Redis. Os segredos ficam criptografados no repositório de configurações.
 
 Se `app.jwt.audience` não estiver definido, a aplicação não inicia.
