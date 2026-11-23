@@ -10,6 +10,7 @@ import br.api.universum.identity.modules.user.model.User;
 import br.api.universum.identity.modules.user.repository.UserRepository;
 
 import lombok.AllArgsConstructor;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
