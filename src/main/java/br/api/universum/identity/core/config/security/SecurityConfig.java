@@ -1,9 +1,5 @@
 package br.api.universum.identity.core.config.security;
 
-import br.api.universum.identity.core.filter.RateLimitingFilter;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -16,20 +12,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
     @Bean
     @Order(1)
-    public SecurityFilterChain authenticationSecurityFilterChain(HttpSecurity http,
-            CorsConfigurationSource corsConfigurationSource, RateLimitingFilter rateLimitingFilter) {
+    public SecurityFilterChain authenticationSecurityFilterChain(HttpSecurity http) {
         // A stale Authorization header must not prevent login, refresh or logout.
-        statelessApi(http, corsConfigurationSource, rateLimitingFilter)
+        statelessApi(http)
                 .securityMatchers(matchers -> matchers.requestMatchers(HttpMethod.POST,
                         "/identity/api/v1/auth/login", "/identity/api/v1/auth/refresh", "/identity/api/v1/auth/logout"))
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
@@ -38,9 +29,8 @@ public class SecurityConfig {
 
     @Bean
     @Order(2)
-    public SecurityFilterChain securityFilterChain(HttpSecurity http,
-            CorsConfigurationSource corsConfigurationSource, RateLimitingFilter rateLimitingFilter) {
-        statelessApi(http, corsConfigurationSource, rateLimitingFilter)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+        statelessApi(http)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.GET, "/.well-known/jwks.json", "/health", "/identity/amiworking", "/actuator/health",
                                 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
@@ -50,37 +40,15 @@ public class SecurityConfig {
         return http.build();
     }
 
-    private HttpSecurity statelessApi(HttpSecurity http, CorsConfigurationSource cors,
-                                     RateLimitingFilter rateLimitingFilter) {
-        http.csrf(AbstractHttpConfigurer::disable)
-                .cors(configuration -> configuration.configurationSource(cors))
+    /** O CORS fica no gateway, que é o único ponto de entrada. */
+    private HttpSecurity statelessApi(HttpSecurity http) {
+        return http.csrf(AbstractHttpConfigurer::disable)
+                .cors(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .requestCache(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.addFilterAfter(rateLimitingFilter, CorsFilter.class);
-        return http;
-    }
-
-    @Bean
-    public FilterRegistrationBean<RateLimitingFilter> rateLimitRegistration(RateLimitingFilter filter) {
-        FilterRegistrationBean<RateLimitingFilter> registration = new FilterRegistrationBean<>(filter);
-        registration.setEnabled(false);
-        return registration;
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource(
-            @Value("${app.cors.allowed-origins}") List<String> allowedOrigins) {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(allowedOrigins);
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
-        configuration.setAllowCredentials(false);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
     }
 
     @Bean

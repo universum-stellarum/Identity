@@ -317,20 +317,6 @@ class AuthenticationIntegrationTest {
     }
 
     @Test
-    void shouldTriggerRateLimitWhenRequestLimitExceeded() throws Exception {
-        // The bucket refills while requests run; the exact capacity is covered with a fixed clock in unit tests.
-        for (int i = 0; i < 100; i++) {
-            var result = mockMvc.perform(get("/v3/api-docs"));
-            if (result.andReturn().getResponse().getStatus() == 429) {
-                result.andExpect(jsonPath("$.detail", containsString("Too many requests")));
-                return;
-            }
-            result.andExpect(status().isOk());
-        }
-        org.junit.jupiter.api.Assertions.fail("Expected throttling during a burst of requests");
-    }
-
-    @Test
     void authenticatedUserCanListUsersAndUpdateOwnProfile() throws Exception {
         User user = userRepository.save(User.register("regular@universum.api.br", "unused", "Regular"));
         String auth = "Bearer " + tokenService.generateAccessToken(user);

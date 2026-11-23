@@ -62,10 +62,12 @@ No repositório de configurações, o arquivo `identity-<perfil>.yaml` precisa d
 
 - `app.jwt.issuer`: emissor dos tokens. Deve coincidir com o `issuer-uri` configurado no gateway.
 - `app.jwt.audience`: público dos tokens. Deve coincidir com `gateway.security.jwt-audience` no gateway.
-- `app.cors.allowed-origins`: origens do frontend aceitas pelo CORS, separadas por vírgula. Não há variável de ambiente para isso.
 - Conexão com PostgreSQL e Redis. Os segredos ficam criptografados no repositório de configurações.
 
 Se `app.jwt.audience` não estiver definido, a aplicação não inicia.
+
+CORS não fica aqui: é aplicado pelo gateway, que é o único ponto de entrada
+(`gateway.cors.allowed-origins` em `gateway-<perfil>.yaml`).
 
 ### Rodando na máquina (IntelliJ)
 
