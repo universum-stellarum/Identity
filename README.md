@@ -55,7 +55,7 @@ Os valores específicos de cada ambiente vêm do Config Server (Aldebaran). A ap
 
 | Variável | Uso |
 | --- | --- |
-| `APP_ENV` | Perfil Spring: `dev` ou `prod` |
+| `APP_ENV` | Perfil Spring: `dev` ou `prod`; para rodar na máquina, `dev,local` (ver abaixo) |
 | `CONFIG_SERVER_URL` | URL base do Config Server, por exemplo `http://config-server:8888` na rede do ambiente |
 
 No repositório de configurações, o arquivo `identity-<perfil>.yaml` precisa definir, entre outros:
@@ -67,9 +67,20 @@ No repositório de configurações, o arquivo `identity-<perfil>.yaml` precisa d
 
 Se `app.jwt.audience` não estiver definido, a aplicação não inicia.
 
+### Rodando na máquina (IntelliJ)
+
+Use `APP_ENV=dev,local`. O config server entrega `identity-dev.yaml` (banco, Redis, JWT, CORS) e
+`application-local.yaml`, que, por ser o último perfil, troca os endereços dos serviços
+(`universum.services.*.service`) pelas URIs públicas de desenvolvimento. Para conferir o que chega:
+`<CONFIG_SERVER_URL>/identity/dev,local`.
+
+- Banco e Redis de dev ficam no Tailscale: a máquina precisa estar conectada.
+- Chamadas a outros serviços passam pelo gateway público e precisam de um JWT válido.
+- Só `local` não basta: não existe `identity-local.yaml`, e o serviço subiria sem banco nem JWT.
+
 ## Rede
 
-O serviço entra na rede `universum-<ambiente>` com o alias `antares`, e o alias `config-server`
+O serviço entra na rede `universum-<ambiente>` com o alias `identity`, e o alias `config-server`
 fica disponível para ele na mesma rede. Não é publicado no host. A porta interna é `8080`.
 
 ## Execução

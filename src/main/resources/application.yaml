@@ -7,7 +7,6 @@ spring:
 
   config:
     import:
-      - "optional:file:./.env[.properties]"
       - "configserver:${CONFIG_SERVER_URL}"
   cloud:
     config:
