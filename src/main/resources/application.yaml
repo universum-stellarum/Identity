@@ -11,4 +11,6 @@ spring:
   cloud:
     config:
       profile: ${spring.profiles.active}
+      # Branch do repositório configurations com o mesmo nome do perfil (dev ou prod).
+      label: ${spring.profiles.active}
 
