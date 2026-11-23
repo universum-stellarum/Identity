@@ -30,9 +30,9 @@ class IdentityBoundaryIntegrationTest {
     @Autowired AuthService auth;
 
     @Test
-    void healthzIsPublicAndIgnoresAStaleAccessToken() throws Exception {
+    void amIWorkingIsPublicAndIgnoresAStaleAccessToken() throws Exception {
         for (var request : new org.springframework.test.web.servlet.RequestBuilder[]{
-                get("/healthz"), get("/healthz").header("Authorization", "Bearer expired-access-token")}) {
+                get("/identity/amiworking"), get("/identity/amiworking").header("Authorization", "Bearer expired-access-token")}) {
             mvc.perform(request)
                     .andExpect(status().isOk())
                     .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))

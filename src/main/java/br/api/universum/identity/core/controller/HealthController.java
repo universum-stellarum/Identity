@@ -17,8 +17,8 @@ public class HealthController {
     }
 
     /** Página de teste para conferir no navegador que o gateway está roteando até o identity. */
-    @GetMapping(value = "/healthz", produces = MediaType.TEXT_PLAIN_VALUE)
-    public String healthz() {
+    @GetMapping(value = "/identity/amiworking", produces = MediaType.TEXT_PLAIN_VALUE)
+    public String amIWorking() {
         return "identity: application running";
     }
 }
