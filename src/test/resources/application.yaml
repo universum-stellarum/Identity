@@ -1,0 +1,16 @@
+# Replaces src/main/resources/application.yaml during tests (test-classes come first on the
+# classpath), so the tests run without the Config Server. The values below mirror the ones in the
+# configurations repository (identity-<profile>.yaml) that the tests depend on.
+spring:
+  application:
+    name: identity
+  cloud:
+    config:
+      enabled: false
+      import-check:
+        enabled: false
+
+app:
+  jwt:
+    audience: universum-api
+    issuer: https://production.universum.api.br

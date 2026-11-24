@@ -1,0 +1,4 @@
+# Issuer of the dev environment (identity-dev.yaml in the configurations repository).
+app:
+  jwt:
+    issuer: https://development.universum.api.br
