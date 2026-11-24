@@ -25,42 +25,48 @@ login, renovação e logout.
 
 ## Arquitetura
 
-Arquitetura limpa, em quatro camadas. As dependências apontam sempre para dentro:
+Três camadas, com as dependências sempre apontando para dentro:
 
 ```
-presentation ──┐
-               ├──► application ──► domain
-infrastructure ┘
+infrastructure ──► application ──► domain
 ```
 
-| Camada | Pacote | Conteúdo |
-| --- | --- | --- |
-| Domínio | `domain` | Entidades e regras (`User`, `RefreshToken`, `SigningKey`), exceções de negócio e eventos. Só depende do padrão JPA (`jakarta.persistence`). |
-| Aplicação | `application` | Um caso de uso por classe (`usecase`), os ports que eles precisam (`port`) e os DTOs de entrada e saída (`dto`). Sem Spring. |
-| Infraestrutura | `infrastructure` | Implementação dos ports: repositórios Spring Data (`persistence`), JWT, BCrypt e SHA-256 (`security`), eventos e configuração do Spring (`config`). |
-| Apresentação | `presentation` | Controllers REST, requests e responses HTTP, tratamento de erros e OpenAPI. |
+```
+domain/
+  model/            User, RefreshToken, SigningKey: entidades JPA (Lombok, Hibernate, auditoria)
+  exception/        exceções de negócio
+  event/            SigningKeyRotated
+application/
+  abstractions/     interfaces que a aplicação precisa (UserRepository, AccessTokenIssuer, TokenHasher...)
+  usecases/
+    auth/           login, refresh e logout, com seus requests e responses
+    users/          cadastro, consulta, alteração e remoção de usuários
+    keys/           geração, consulta e rotação da chave de assinatura
+infrastructure/
+  endpoints/        controllers REST
+  web/              tratamento de erros, usuário autenticado (@CurrentUserId), OpenAPI
+  persistence/      repositórios Spring Data (JpaUserRepository...), que implementam as abstrações
+  security/         segurança HTTP, JWT, chaves RSA, SHA-256 e geração dos refresh tokens
+  config/           Clock, PasswordEncoder e auditoria JPA
+```
 
-- Os modelos do domínio são as próprias entidades JPA, mapeados só com anotações do padrão
-  (`jakarta.persistence`): nada de Hibernate ou Spring Data no domínio. `created_at`/`updated_at`
-  são preenchidos por `@PrePersist`/`@PreUpdate`.
-- Os ports são interfaces com o sufixo `Port` (`UserRepositoryPort`, `PasswordHasherPort`...), e as
-  implementações levam a tecnologia no nome (`UserJpaRepository`, `BCryptPasswordHasher`...).
-- Não há adapter entre o Spring Data e a aplicação: cada repositório Spring Data (`*JpaRepository`)
-  estende o port e o implementa diretamente. Métodos com a mesma assinatura do `JpaRepository`
-  (`findById`, `save`, `delete`) e consultas derivadas do nome são gerados pelo Spring; bloqueios e
-  consultas explícitas são redeclarados no repositório; o que o Spring não deriva (paginação com
-  `PageQuery`) é um método `default`.
-- Os casos de uso não têm anotações do Spring. O `UseCaseConfig` os registra pelo pacote, e cada um
-  recebe pelo construtor as implementações dos seus ports.
-- A transação é o port `UnitOfWorkPort`. Uma `DomainException` **commita** o que o caso de uso já
-  gravou e depois é relançada: login com senha errada mantém o contador de tentativas e reuso de
-  refresh token mantém a revogação das sessões. Qualquer outra exceção faz rollback.
-- Lombok é usado em todas as camadas, inclusive no domínio (`@Getter` e construtor privado; sem
-  `@Setter`/`@Data`, para que o estado só mude pelos métodos de negócio). Como atua só na
-  compilação, não cria dependência em tempo de execução.
-- O `ArchitectureTest` (ArchUnit) quebra o build se alguma dependência apontar para fora, se a
-  aplicação depender de framework, se o domínio depender de algo além de `jakarta.persistence` e
-  Lombok, ou se a convenção do sufixo `Port` for quebrada.
+- **Casos de uso:** uma classe por caso, `@Service` com `@Transactional` e um método `execute`. Os
+  controllers chamam os casos de uso diretamente e usam os requests e responses deles como corpo
+  HTTP, sem DTOs intermediários.
+- **Validação:** os requests carregam Bean Validation (`@NotBlank`, `@Email`, `@Size`) e os
+  controllers usam `@Valid`; erros viram 400 com o mapa `errors`. As entidades ainda verificam os
+  próprios invariantes como última linha de defesa.
+- **Transações:** login e refresh usam `noRollbackFor = BusinessException.class`, para que a tentativa
+  falha e a revogação das sessões em caso de reuso sejam gravadas mesmo com a exceção.
+- **Nomes:** a interface fica com o nome limpo e a implementação leva a tecnologia
+  (`UserRepository` ← `JpaUserRepository`, `TokenHasher` ← `Sha256TokenHasher`), como no padrão do
+  Java (`List` ← `ArrayList`).
+- **Repositórios:** os repositórios Spring Data estendem as abstrações e as implementam diretamente:
+  `findById`, `findAll(Pageable)`, `save`, `delete` e as consultas derivadas do nome são gerados pelo
+  Spring; bloqueios e queries explícitas são redeclarados no repositório.
+- **Regras de arquitetura:** o `ArchitectureTest` (ArchUnit) quebra o build se a aplicação depender da
+  infraestrutura ou de tecnologias dela (web, JPA, JWT), ou se um controller usar repositórios ou
+  entidades em vez dos casos de uso.
 
 ## Endpoints
 
