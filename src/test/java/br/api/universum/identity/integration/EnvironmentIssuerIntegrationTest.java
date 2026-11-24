@@ -1,8 +1,8 @@
 package br.api.universum.identity.integration;
 
-import br.api.universum.identity.application.dto.LoginCommand;
-import br.api.universum.identity.application.port.UserRepositoryPort;
-import br.api.universum.identity.application.usecase.LoginUseCase;
+import br.api.universum.identity.application.usecases.auth.LoginRequest;
+import br.api.universum.identity.application.abstractions.UserRepository;
+import br.api.universum.identity.application.usecases.auth.LoginUseCase;
 import br.api.universum.identity.domain.model.User;
 
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class EnvironmentIssuerIntegrationTest {
 
     @Autowired LoginUseCase login;
-    @Autowired UserRepositoryPort users;
+    @Autowired UserRepository users;
     @Autowired PasswordEncoder passwords;
     @Autowired JwtDecoder decoder;
     @Autowired JwtEncoder encoder;
@@ -38,7 +38,7 @@ class EnvironmentIssuerIntegrationTest {
     @Test
     void deploymentIssuerIsUsedForLoginAndProtectedRequests() throws Exception {
         var user = users.save(User.register("environment@universum.api.br", passwords.encode("secret123"), "Environment"));
-        var tokens = login.execute(new LoginCommand(user.getEmail(), "secret123"));
+        var tokens = login.execute(new LoginRequest(user.getEmail(), "secret123"));
         assertThat(decoder.decode(tokens.accessToken()).getIssuer().toString())
                 .isEqualTo("https://development.universum.api.br");
         mvc.perform(get("/identity/api/v1/users/me").header("Authorization", "Bearer " + tokens.accessToken()))

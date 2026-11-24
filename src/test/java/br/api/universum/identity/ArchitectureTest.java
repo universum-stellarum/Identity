@@ -4,19 +4,20 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import org.junit.jupiter.api.Test;
+import org.springframework.stereotype.Service;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 
 /**
- * Garante a regra de dependência da arquitetura limpa: as dependências do código só apontam para dentro.
+ * Garante a regra de dependência entre as camadas: as dependências só apontam para dentro.
  *
  * <pre>
- * presentation ─┐
- *               ├─► application ─► domain
- * infrastructure┘
+ * infrastructure ──► application ──► domain
  * </pre>
+ *
+ * A aplicação declara as abstrações (interfaces) de que precisa, e a infraestrutura as implementa.
  */
 class ArchitectureTest {
 
@@ -33,65 +34,62 @@ class ArchitectureTest {
                 .layer("Domain").definedBy(ROOT + ".domain..")
                 .layer("Application").definedBy(ROOT + ".application..")
                 .layer("Infrastructure").definedBy(ROOT + ".infrastructure..")
-                .layer("Presentation").definedBy(ROOT + ".presentation..")
-                .whereLayer("Presentation").mayNotBeAccessedByAnyLayer()
                 .whereLayer("Infrastructure").mayNotBeAccessedByAnyLayer()
-                .whereLayer("Application").mayOnlyBeAccessedByLayers("Infrastructure", "Presentation")
-                .whereLayer("Domain").mayOnlyBeAccessedByLayers("Application", "Infrastructure", "Presentation")
+                .whereLayer("Application").mayOnlyBeAccessedByLayers("Infrastructure")
+                .whereLayer("Domain").mayOnlyBeAccessedByLayers("Application", "Infrastructure")
                 .check(CLASSES);
     }
 
     @Test
-    void applicationDoesNotDependOnFrameworks() {
-        noClasses().that().resideInAPackage(ROOT + ".application..")
+    void endpointsGoThroughTheUseCases() {
+        noClasses().that().resideInAPackage(ROOT + ".infrastructure.endpoints..")
                 .should().dependOnClassesThat().resideInAnyPackage(
-                        "org.springframework..",
-                        "jakarta..",
-                        "org.hibernate..",
-                        "com.nimbusds..",
-                        "io.swagger..",
-                        "com.fasterxml.."
-                )
-                .because("frameworks são detalhes: pertencem à infraestrutura e à apresentação")
+                        ROOT + ".application.abstractions..",
+                        ROOT + ".infrastructure.persistence..",
+                        ROOT + ".domain.model..")
+                .because("os controllers chamam os casos de uso, não os repositórios nem as entidades")
                 .check(CLASSES);
     }
 
     /**
-     * Os modelos do domínio também são as entidades JPA, então as anotações de mapeamento do padrão
-     * ({@code jakarta.persistence}) são permitidas. Nada específico de fornecedor (Hibernate, Spring
-     * Data) é. O Lombok atua na compilação e só deixa {@code @lombok.Generated} (retenção CLASS,
-     * nunca carregada em execução) nos getters e construtores gerados.
+     * A aplicação usa o que o Spring oferece (anotações, transações, eventos, paginação, PasswordEncoder),
+     * mas não detalhes de web, de JPA ou de JWT, que ficam na infraestrutura.
      */
     @Test
-    void domainDependsOnlyOnTheJpaStandard() {
-        noClasses().that().resideInAPackage(ROOT + ".domain..")
-                .should().dependOnClassesThat().resideOutsideOfPackages(
-                        ROOT + ".domain..", "java..", "jakarta.persistence..", "lombok..")
+    void theApplicationDoesNotDependOnInfrastructureTechnologies() {
+        noClasses().that().resideInAPackage(ROOT + ".application..")
+                .should().dependOnClassesThat().resideInAnyPackage(
+                        "org.springframework.web..",
+                        "org.springframework.data.jpa..",
+                        "org.springframework.security.oauth2..",
+                        "jakarta.servlet..",
+                        "org.hibernate..",
+                        "com.nimbusds..",
+                        "io.swagger.."
+                )
                 .check(CLASSES);
     }
 
     @Test
-    void useCasesAreNamedAfterWhatTheyDo() {
-        classes().that().resideInAPackage(ROOT + ".application.usecase..")
+    void abstractionsAreInterfaces() {
+        classes().that().resideInAPackage(ROOT + ".application.abstractions..")
                 .and().areTopLevelClasses()
+                .should().beInterfaces()
+                .check(CLASSES);
+    }
+
+    @Test
+    void useCasesAreServicesNamedAfterWhatTheyDo() {
+        classes().that().resideInAPackage(ROOT + ".application.usecases..")
+                .and().areAnnotatedWith(Service.class)
                 .should().haveSimpleNameEndingWith("UseCase")
                 .check(CLASSES);
     }
 
     @Test
-    void portsAreInterfacesNamedWithThePortSuffix() {
-        classes().that().resideInAPackage(ROOT + ".application.port..")
-                .and().areTopLevelClasses()
-                .should().beInterfaces()
-                .andShould().haveSimpleNameEndingWith("Port")
-                .check(CLASSES);
-    }
-
-    @Test
-    void onlyPortsUseThePortSuffix() {
-        noClasses().that().resideOutsideOfPackage(ROOT + ".application.port..")
-                .should().haveSimpleNameEndingWith("Port")
-                .because("o sufixo distingue a interface (port) das implementações")
+    void controllersLiveInEndpoints() {
+        classes().that().haveSimpleNameEndingWith("Controller")
+                .should().resideInAPackage(ROOT + ".infrastructure.endpoints..")
                 .check(CLASSES);
     }
 }

@@ -1,7 +1,7 @@
 package br.api.universum.identity.infrastructure.security.jwt;
 
-import br.api.universum.identity.application.usecase.GetActiveSigningKeyUseCase;
-import br.api.universum.identity.application.usecase.InitializeSigningKeyUseCase;
+import br.api.universum.identity.application.usecases.keys.GetActiveSigningKeyUseCase;
+import br.api.universum.identity.application.usecases.keys.InitializeSigningKeyUseCase;
 import br.api.universum.identity.domain.event.SigningKeyRotated;
 import br.api.universum.identity.domain.model.SigningKey;
 

@@ -1,6 +1,6 @@
 package br.api.universum.identity.infrastructure.security.jwt;
 
-import br.api.universum.identity.application.port.SigningKeyGeneratorPort;
+import br.api.universum.identity.application.abstractions.SigningKeyGenerator;
 
 import org.springframework.stereotype.Component;
 
@@ -10,7 +10,7 @@ import java.security.KeyPairGenerator;
 import java.util.Base64;
 
 @Component
-public class RsaSigningKeyGenerator implements SigningKeyGeneratorPort {
+public class RsaSigningKeyGenerator implements SigningKeyGenerator {
 
     private static final int KEY_SIZE = 2048;
 

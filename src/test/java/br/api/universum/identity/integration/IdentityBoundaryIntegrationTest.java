@@ -1,8 +1,8 @@
 package br.api.universum.identity.integration;
 
-import br.api.universum.identity.application.dto.LoginCommand;
-import br.api.universum.identity.application.port.UserRepositoryPort;
-import br.api.universum.identity.application.usecase.LoginUseCase;
+import br.api.universum.identity.application.usecases.auth.LoginRequest;
+import br.api.universum.identity.application.abstractions.UserRepository;
+import br.api.universum.identity.application.usecases.auth.LoginUseCase;
 import br.api.universum.identity.domain.model.User;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class IdentityBoundaryIntegrationTest {
 
     @Autowired MockMvc mvc;
-    @Autowired UserRepositoryPort users;
+    @Autowired UserRepository users;
     @Autowired PasswordEncoder passwords;
     @Autowired LoginUseCase login;
 
@@ -50,7 +50,7 @@ class IdentityBoundaryIntegrationTest {
     @Test
     void publishesOnlyThePublicKeyAndItVerifiesIssuedAccessTokens() throws Exception {
         var user = users.save(User.register("jwks-boundary@universum.api.br", passwords.encode("secret123"), "JWKS"));
-        var tokens = login.execute(new LoginCommand(user.getEmail(), "secret123"));
+        var tokens = login.execute(new LoginRequest(user.getEmail(), "secret123"));
         var response = mvc.perform(get("/.well-known/jwks.json"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.keys[0].alg").value("RS256"))

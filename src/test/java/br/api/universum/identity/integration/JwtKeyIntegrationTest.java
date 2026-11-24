@@ -1,12 +1,13 @@
 package br.api.universum.identity.integration;
 
-import br.api.universum.identity.application.dto.LoginCommand;
-import br.api.universum.identity.application.port.SigningKeyRepositoryPort;
-import br.api.universum.identity.application.port.UserRepositoryPort;
-import br.api.universum.identity.application.usecase.InitializeSigningKeyUseCase;
-import br.api.universum.identity.application.usecase.LoginUseCase;
-import br.api.universum.identity.application.usecase.RefreshSessionUseCase;
-import br.api.universum.identity.application.usecase.RotateSigningKeyUseCase;
+import br.api.universum.identity.application.usecases.auth.LoginRequest;
+import br.api.universum.identity.application.abstractions.SigningKeyRepository;
+import br.api.universum.identity.application.abstractions.UserRepository;
+import br.api.universum.identity.application.usecases.keys.InitializeSigningKeyUseCase;
+import br.api.universum.identity.application.usecases.auth.LoginUseCase;
+import br.api.universum.identity.application.usecases.auth.RefreshSessionUseCase;
+import br.api.universum.identity.application.usecases.auth.RefreshTokenRequest;
+import br.api.universum.identity.application.usecases.keys.RotateSigningKeyUseCase;
 import br.api.universum.identity.domain.model.SigningKey;
 import br.api.universum.identity.domain.model.User;
 
@@ -45,10 +46,10 @@ class JwtKeyIntegrationTest {
 
     @Autowired InitializeSigningKeyUseCase initializeKey;
     @Autowired RotateSigningKeyUseCase rotateKey;
-    @Autowired SigningKeyRepositoryPort keys;
+    @Autowired SigningKeyRepository keys;
     @Autowired JdbcTemplate jdbc;
     @Autowired MockMvc mvc;
-    @Autowired UserRepositoryPort users;
+    @Autowired UserRepository users;
     @Autowired LoginUseCase login;
     @Autowired RefreshSessionUseCase refreshSession;
     @Autowired PasswordEncoder passwords;
@@ -93,7 +94,7 @@ class JwtKeyIntegrationTest {
     void rotationRequiresAuthenticationAndNeverReturnsPrivateMaterial() throws Exception {
         mvc.perform(post("/identity/api/v1/auth/keys")).andExpect(status().isUnauthorized());
         var user = users.save(User.register("keys@universum.api.br", passwords.encode("secret123"), "Keys"));
-        var tokens = login.execute(new LoginCommand(user.getEmail(), "secret123"));
+        var tokens = login.execute(new LoginRequest(user.getEmail(), "secret123"));
         UUID oldId = activeKey().getKeyId();
         mvc.perform(post("/identity/api/v1/auth/keys").header("Authorization", "Bearer " + tokens.accessToken()))
                 .andExpect(status().isCreated())
@@ -105,7 +106,7 @@ class JwtKeyIntegrationTest {
         assertThat(activeKey().getKeyId()).isNotEqualTo(oldId);
         mvc.perform(get("/identity/api/v1/users/me").header("Authorization", "Bearer " + tokens.accessToken()))
                 .andExpect(status().isUnauthorized());
-        var renewed = refreshSession.execute(tokens.refreshToken());
+        var renewed = refreshSession.execute(new RefreshTokenRequest(tokens.refreshToken()));
         mvc.perform(get("/identity/api/v1/users/me").header("Authorization", "Bearer " + renewed.accessToken()))
                 .andExpect(status().isOk());
     }
@@ -121,7 +122,7 @@ class JwtKeyIntegrationTest {
     @Test
     void rolledBackRotationPreservesThePersistedAndCachedKey() {
         users.save(User.register("rollback@universum.api.br", passwords.encode("secret123"), "Rollback"));
-        var tokens = login.execute(new LoginCommand("rollback@universum.api.br", "secret123"));
+        var tokens = login.execute(new LoginRequest("rollback@universum.api.br", "secret123"));
         var previous = activeKey().getKeyId();
         new TransactionTemplate(transactions).executeWithoutResult(status -> {
             rotateKey.execute();

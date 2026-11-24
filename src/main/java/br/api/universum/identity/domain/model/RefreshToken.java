@@ -3,13 +3,13 @@ package br.api.universum.identity.domain.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -23,11 +23,12 @@ import static br.api.universum.identity.domain.model.Guard.requireText;
 @Table(name = "refresh_tokens")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class RefreshToken extends AuditableEntity {
+public class RefreshToken extends BaseEntity<UUID> {
 
     /** Gerado no primeiro save; {@code null} até lá. */
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue
+    @UuidGenerator
     private UUID id;
 
     /** SHA-256 em hex do refresh token. O valor original nunca é persistido. */

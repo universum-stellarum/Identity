@@ -29,7 +29,7 @@ import static br.api.universum.identity.domain.model.Guard.requireText;
 @Table(name = "jwt_signing_key")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class SigningKey extends AuditableEntity {
+public class SigningKey extends BaseEntity<Integer> {
 
     public static final String ALGORITHM = "RS256";
     public static final int SINGLETON_ID = 1;

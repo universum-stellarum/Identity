@@ -1,6 +1,6 @@
 package br.api.universum.identity.infrastructure.security;
 
-import br.api.universum.identity.application.port.TokenHasherPort;
+import br.api.universum.identity.application.abstractions.TokenHasher;
 
 import org.springframework.stereotype.Component;
 
@@ -11,7 +11,7 @@ import java.util.HexFormat;
 
 /** Hash SHA-256 em hex. Usado para guardar e localizar refresh tokens sem persistir o valor. */
 @Component
-public class Sha256TokenHasher implements TokenHasherPort {
+public class Sha256TokenHasher implements TokenHasher {
 
     @Override
     public String hash(String rawToken) {
