@@ -39,9 +39,11 @@ domain/
 application/
   abstractions/     interfaces que a aplicação precisa (UserRepository, AccessTokenIssuer, TokenHasher...)
   usecases/
-    auth/           login, refresh e logout, com seus requests e responses
+    auth/           login, refresh e logout
     users/          cadastro, consulta, alteração e remoção de usuários
     keys/           geração, consulta e rotação da chave de assinatura
+      request/      entrada dos casos de uso do assunto (com Bean Validation)
+      response/     saída dos casos de uso do assunto
 infrastructure/
   endpoints/        controllers REST
   web/              tratamento de erros, usuário autenticado (@CurrentUserId), OpenAPI
