@@ -42,8 +42,8 @@ class ArchitectureTest {
     }
 
     @Test
-    void domainAndApplicationDoNotDependOnFrameworks() {
-        noClasses().that().resideInAnyPackage(ROOT + ".domain..", ROOT + ".application..")
+    void applicationDoesNotDependOnFrameworks() {
+        noClasses().that().resideInAPackage(ROOT + ".application..")
                 .should().dependOnClassesThat().resideInAnyPackage(
                         "org.springframework..",
                         "jakarta..",
@@ -56,10 +56,17 @@ class ArchitectureTest {
                 .check(CLASSES);
     }
 
+    /**
+     * The domain models are also the JPA entities, so the standard mapping annotations
+     * ({@code jakarta.persistence}) are allowed. Nothing vendor specific (Hibernate, Spring Data) is.
+     * Lombok runs at compile time and only leaves {@code @lombok.Generated} (CLASS retention,
+     * never loaded at runtime) on the generated getters and constructors.
+     */
     @Test
-    void domainDoesNotDependOnLibrariesAtAll() {
+    void domainDependsOnlyOnTheJpaStandard() {
         noClasses().that().resideInAPackage(ROOT + ".domain..")
-                .should().dependOnClassesThat().resideOutsideOfPackages(ROOT + ".domain..", "java..")
+                .should().dependOnClassesThat().resideOutsideOfPackages(
+                        ROOT + ".domain..", "java..", "jakarta.persistence..", "lombok..")
                 .check(CLASSES);
     }
 

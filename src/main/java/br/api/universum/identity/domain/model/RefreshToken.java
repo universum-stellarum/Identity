@@ -1,5 +1,16 @@
 package br.api.universum.identity.domain.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
@@ -7,24 +18,30 @@ import java.util.UUID;
 import static br.api.universum.identity.domain.model.Guard.requireNonNull;
 import static br.api.universum.identity.domain.model.Guard.requireText;
 
-public class RefreshToken {
+@Getter
+@Entity
+@Table(name = "refresh_tokens")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class RefreshToken extends AuditableEntity {
 
-    /** Assigned by the persistence layer; {@code null} until the token is saved for the first time. */
-    private final UUID id;
+    /** Generated on first save; {@code null} until then. */
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     /** SHA-256 em hex do refresh token. O valor original nunca é persistido. */
-    private final String tokenHash;
-    private final UUID userId;
-    private final Instant expiryDate;
-    private boolean revoked;
+    @Column(name = "token_hash", nullable = false, unique = true, updatable = false)
+    private String tokenHash;
 
-    private RefreshToken(UUID id, String tokenHash, UUID userId, Instant expiryDate, boolean revoked) {
-        this.id = id;
-        this.tokenHash = tokenHash;
-        this.userId = userId;
-        this.expiryDate = expiryDate;
-        this.revoked = revoked;
-    }
+    @Column(name = "user_id", nullable = false, updatable = false)
+    private UUID userId;
+
+    @Column(name = "expiry_date", nullable = false, updatable = false)
+    private Instant expiryDate;
+
+    @Column(nullable = false)
+    private boolean revoked;
 
     public static RefreshToken issue(String tokenHash, UUID userId, Instant now, Duration validFor) {
         return new RefreshToken(
@@ -36,7 +53,7 @@ public class RefreshToken {
         );
     }
 
-    /** Rebuilds a token that was already persisted. The stored state is trusted as is. */
+    /** Rebuilds a token in a known state, as it would come from storage. */
     public static RefreshToken restore(UUID id, String tokenHash, UUID userId, Instant expiryDate, boolean revoked) {
         return new RefreshToken(id, tokenHash, userId, expiryDate, revoked);
     }
@@ -47,25 +64,5 @@ public class RefreshToken {
 
     public void revoke() {
         this.revoked = true;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getTokenHash() {
-        return tokenHash;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public Instant getExpiryDate() {
-        return expiryDate;
-    }
-
-    public boolean isRevoked() {
-        return revoked;
     }
 }

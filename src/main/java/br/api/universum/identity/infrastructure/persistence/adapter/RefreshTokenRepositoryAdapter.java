@@ -2,7 +2,6 @@ package br.api.universum.identity.infrastructure.persistence.adapter;
 
 import br.api.universum.identity.application.port.RefreshTokenRepository;
 import br.api.universum.identity.domain.model.RefreshToken;
-import br.api.universum.identity.infrastructure.persistence.entity.RefreshTokenJpaEntity;
 import br.api.universum.identity.infrastructure.persistence.repository.RefreshTokenJpaRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -19,21 +18,12 @@ public class RefreshTokenRepositoryAdapter implements RefreshTokenRepository {
 
     @Override
     public Optional<RefreshToken> findByTokenHashForUpdate(String tokenHash) {
-        return jpa.findByTokenHash(tokenHash).map(RefreshTokenJpaEntity::toDomain);
+        return jpa.findByTokenHash(tokenHash);
     }
 
     @Override
     public RefreshToken save(RefreshToken token) {
-        RefreshTokenJpaEntity entity;
-        if (token.getId() == null) {
-            entity = RefreshTokenJpaEntity.newFrom(token);
-        } else {
-            // Inside the unit of work this returns the instance already loaded (and locked).
-            entity = jpa.findById(token.getId()).orElseThrow(
-                    () -> new IllegalStateException("Refresh token %s no longer exists.".formatted(token.getId())));
-            entity.copyFrom(token);
-        }
-        return jpa.save(entity).toDomain();
+        return jpa.save(token);
     }
 
     @Override

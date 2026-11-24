@@ -1,6 +1,6 @@
 package br.api.universum.identity.infrastructure.persistence.repository;
 
-import br.api.universum.identity.infrastructure.persistence.entity.RefreshTokenJpaEntity;
+import br.api.universum.identity.domain.model.RefreshToken;
 
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,12 +12,12 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface RefreshTokenJpaRepository extends JpaRepository<RefreshTokenJpaEntity, UUID> {
+public interface RefreshTokenJpaRepository extends JpaRepository<RefreshToken, UUID> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<RefreshTokenJpaEntity> findByTokenHash(String tokenHash);
+    Optional<RefreshToken> findByTokenHash(String tokenHash);
 
     @Modifying(flushAutomatically = true)
-    @Query("UPDATE RefreshTokenJpaEntity t SET t.revoked = true WHERE t.userId = :userId AND t.revoked = false")
+    @Query("UPDATE RefreshToken t SET t.revoked = true WHERE t.userId = :userId AND t.revoked = false")
     void revokeAllByUserId(@Param("userId") UUID userId);
 }

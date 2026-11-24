@@ -35,18 +35,23 @@ infrastructure ┘
 
 | Camada | Pacote | Conteúdo |
 | --- | --- | --- |
-| Domínio | `domain` | Entidades e regras (`User`, `RefreshToken`, `SigningKey`), exceções de negócio e eventos. Java puro. |
+| Domínio | `domain` | Entidades e regras (`User`, `RefreshToken`, `SigningKey`), exceções de negócio e eventos. Só depende do padrão JPA (`jakarta.persistence`). |
 | Aplicação | `application` | Um caso de uso por classe (`usecase`), os ports que eles precisam (`port`) e os DTOs de entrada e saída (`dto`). Sem Spring. |
-| Infraestrutura | `infrastructure` | Implementação dos ports: JPA (`persistence`), JWT, BCrypt e SHA-256 (`security`), eventos e configuração do Spring (`config`). |
+| Infraestrutura | `infrastructure` | Implementação dos ports: repositórios Spring Data (`persistence`), JWT, BCrypt e SHA-256 (`security`), eventos e configuração do Spring (`config`). |
 | Apresentação | `presentation` | Controllers REST, requests e responses HTTP, tratamento de erros e OpenAPI. |
 
-- As entidades JPA (`*JpaEntity`) ficam na infraestrutura e são convertidas para o domínio nos
-  adapters. O domínio não conhece JPA.
+- Os modelos do domínio são as próprias entidades JPA, mapeados só com anotações do padrão
+  (`jakarta.persistence`): nada de Hibernate ou Spring Data no domínio. `created_at`/`updated_at`
+  são preenchidos por `@PrePersist`/`@PreUpdate`. Os repositórios Spring Data ficam na
+  infraestrutura, atrás dos ports da aplicação.
 - Os casos de uso não têm anotações. O `UseCaseConfig` os registra pelo pacote, e cada um recebe
   pelo construtor os adapters dos seus ports.
 - A transação é o port `UnitOfWork`. Uma `DomainException` **commita** o que o caso de uso já
   gravou e depois é relançada: login com senha errada mantém o contador de tentativas e reuso de
   refresh token mantém a revogação das sessões. Qualquer outra exceção faz rollback.
+- Lombok é usado em todas as camadas, inclusive no domínio (`@Getter` e construtor privado; sem
+  `@Setter`/`@Data`, para que o estado só mude pelos métodos de negócio). Como atua só na
+  compilação, não cria dependência em tempo de execução.
 - O `ArchitectureTest` (ArchUnit) quebra o build se alguma dependência apontar para fora, ou se o
   domínio ou a aplicação passarem a depender de framework.
 

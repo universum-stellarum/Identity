@@ -4,7 +4,6 @@ import br.api.universum.identity.application.dto.PageQuery;
 import br.api.universum.identity.application.dto.PageResult;
 import br.api.universum.identity.application.port.UserRepository;
 import br.api.universum.identity.domain.model.User;
-import br.api.universum.identity.infrastructure.persistence.entity.UserJpaEntity;
 import br.api.universum.identity.infrastructure.persistence.repository.UserJpaRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -24,12 +23,12 @@ public class UserRepositoryAdapter implements UserRepository {
 
     @Override
     public Optional<User> findById(UUID id) {
-        return jpa.findById(id).map(UserJpaEntity::toDomain);
+        return jpa.findById(id);
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return jpa.findByEmail(email).map(UserJpaEntity::toDomain);
+        return jpa.findByEmail(email);
     }
 
     @Override
@@ -39,27 +38,18 @@ public class UserRepositoryAdapter implements UserRepository {
 
     @Override
     public PageResult<User> findAll(PageQuery query) {
-        Page<UserJpaEntity> page = jpa.findAll(PageRequest.of(query.page(), query.size(), sortOf(query)));
-        return new PageResult<>(page.map(UserJpaEntity::toDomain).getContent(), query, page.getTotalElements());
+        Page<User> page = jpa.findAll(PageRequest.of(query.page(), query.size(), sortOf(query)));
+        return new PageResult<>(page.getContent(), query, page.getTotalElements());
     }
 
     @Override
     public User save(User user) {
-        UserJpaEntity entity;
-        if (user.getId() == null) {
-            entity = UserJpaEntity.newFrom(user);
-        } else {
-            // Inside the unit of work this returns the instance already loaded, without a new query.
-            entity = jpa.findById(user.getId()).orElseThrow(
-                    () -> new IllegalStateException("User %s no longer exists.".formatted(user.getId())));
-            entity.copyFrom(user);
-        }
-        return jpa.save(entity).toDomain();
+        return jpa.save(user);
     }
 
     @Override
     public void delete(User user) {
-        jpa.deleteById(user.getId());
+        jpa.delete(user);
     }
 
     private static Sort sortOf(PageQuery query) {

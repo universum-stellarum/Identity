@@ -1,36 +1,55 @@
 package br.api.universum.identity.domain.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
 import static br.api.universum.identity.domain.model.Guard.requireText;
 
-public class User {
+@Getter
+@Entity
+@Table(name = "users")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class User extends AuditableEntity {
 
     public static final String DEFAULT_ROLE = "ROLE_USER";
     public static final int MAX_FAILED_ATTEMPTS = 5;
     public static final Duration LOCK_DURATION = Duration.ofMinutes(15);
 
-    /** Assigned by the persistence layer; {@code null} until the user is saved for the first time. */
-    private final UUID id;
-    private String email;
-    private final String password;
-    private String name;
-    private String roles;
-    private int failedAttempts;
-    private Instant lockExpiredAt;
+    /** Generated on first save; {@code null} until then. */
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    private User(UUID id, String email, String password, String name, String roles,
-                 int failedAttempts, Instant lockExpiredAt) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.roles = roles;
-        this.failedAttempts = failedAttempts;
-        this.lockExpiredAt = lockExpiredAt;
-    }
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
+    private String roles;
+
+    @Column(name = "failed_attempts", nullable = false)
+    private int failedAttempts;
+
+    @Column(name = "lock_expired_at")
+    private Instant lockExpiredAt;
 
     public static User register(String email, String encodedPassword, String name) {
         return new User(
@@ -44,7 +63,7 @@ public class User {
         );
     }
 
-    /** Rebuilds a user that was already persisted. The stored state is trusted as is. */
+    /** Rebuilds a user in a known state, as it would come from storage. */
     public static User restore(UUID id, String email, String encodedPassword, String name, String roles,
                                int failedAttempts, Instant lockExpiredAt) {
         return new User(id, email, encodedPassword, name, roles, failedAttempts, lockExpiredAt);
@@ -77,33 +96,5 @@ public class User {
 
     public void changeRoles(String roles) {
         this.roles = requireText(roles, "Roles are required.");
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getRoles() {
-        return roles;
-    }
-
-    public int getFailedAttempts() {
-        return failedAttempts;
-    }
-
-    public Instant getLockExpiredAt() {
-        return lockExpiredAt;
     }
 }
