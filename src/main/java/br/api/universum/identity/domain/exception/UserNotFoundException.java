@@ -1,6 +1,6 @@
 package br.api.universum.identity.domain.exception;
 
-/** Indicates that the requested user does not exist. */
+/** Indica que o usuário solicitado não existe. */
 public class UserNotFoundException extends ResourceNotFoundException {
 
     public UserNotFoundException() {

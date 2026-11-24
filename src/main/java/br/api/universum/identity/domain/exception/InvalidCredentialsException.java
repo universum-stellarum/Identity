@@ -1,6 +1,6 @@
 package br.api.universum.identity.domain.exception;
 
-/** Indicates that the email or password given at login is invalid. */
+/** Indica que o e-mail ou a senha informados no login são inválidos. */
 public class InvalidCredentialsException extends BusinessException {
 
     public InvalidCredentialsException() {

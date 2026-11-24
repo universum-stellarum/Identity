@@ -15,8 +15,8 @@ import java.time.Clock;
 import java.time.Duration;
 
 /**
- * Opens a session for an authenticated user: issues the access token and stores a new refresh token.
- * Shared by login and refresh; must run inside the caller's unit of work.
+ * Abre uma sessão para um usuário autenticado: emite o access token e grava um novo refresh token.
+ * Compartilhado por login e refresh; precisa rodar dentro da unidade de trabalho de quem chama.
  */
 @RequiredArgsConstructor
 public class SessionIssuer {

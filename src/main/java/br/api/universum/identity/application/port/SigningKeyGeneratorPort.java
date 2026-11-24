@@ -1,13 +1,13 @@
 package br.api.universum.identity.application.port;
 
-/** Generates a new RSA key pair for signing access tokens. */
+/** Gera um novo par de chaves RSA para assinar os access tokens. */
 public interface SigningKeyGeneratorPort {
 
     GeneratedKeyPair generate();
 
     /**
-     * @param publicKey  Base64 of the X.509 encoded public key
-     * @param privateKey Base64 of the PKCS#8 encoded private key
+     * @param publicKey  Base64 da chave pública codificada em X.509
+     * @param privateKey Base64 da chave privada codificada em PKCS#8
      */
     record GeneratedKeyPair(String publicKey, String privateKey) {
     }

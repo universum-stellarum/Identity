@@ -19,8 +19,8 @@ import java.time.Clock;
 import java.time.Instant;
 
 /**
- * Exchanges a valid refresh token for a new token pair, revoking the token used (rotation).
- * Presenting a token that was already rotated revokes every session of the user.
+ * Troca um refresh token válido por um novo par de tokens e revoga o token usado (rotação).
+ * Apresentar um token que já foi rotacionado revoga todas as sessões do usuário.
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -34,7 +34,7 @@ public class RefreshSessionUseCase {
     private final Clock clock;
 
     // A revogação de todas as sessões em caso de reuso precisa ser persistida, mesmo com a
-    // InvalidRefreshTokenException lançada em seguida: a unit of work commita em DomainException.
+    // InvalidRefreshTokenException lançada em seguida: a unidade de trabalho commita em DomainException.
     public AuthenticationResult execute(String rawRefreshToken) {
         return unitOfWork.execute(() -> {
             RefreshToken current = refreshTokens.findByTokenHashForUpdate(tokenHasher.hash(rawRefreshToken))

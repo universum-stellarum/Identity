@@ -1,6 +1,6 @@
-# Replaces src/main/resources/application.yaml during tests (test-classes come first on the
-# classpath), so the tests run without the Config Server. The values below mirror the ones in the
-# configurations repository (identity-<profile>.yaml) that the tests depend on.
+# Substitui o src/main/resources/application.yaml durante os testes (test-classes vem primeiro no
+# classpath), para que os testes rodem sem o Config Server. Os valores abaixo repetem os do
+# repositório configurations (identity-<perfil>.yaml) de que os testes dependem.
 spring:
   application:
     name: identity

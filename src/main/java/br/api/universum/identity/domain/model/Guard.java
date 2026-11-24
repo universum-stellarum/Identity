@@ -1,6 +1,6 @@
 package br.api.universum.identity.domain.model;
 
-/** Invariant checks shared by the domain models. */
+/** Verificações de invariantes compartilhadas pelos modelos do domínio. */
 final class Guard {
 
     private Guard() {

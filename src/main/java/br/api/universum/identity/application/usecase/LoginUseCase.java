@@ -18,8 +18,8 @@ import java.time.Clock;
 import java.time.Instant;
 
 /**
- * Authenticates email and password and opens a new session. A new login revokes the user's
- * previous refresh tokens (single session). Too many wrong passwords lock the account.
+ * Autentica e-mail e senha e abre uma nova sessão. Um novo login revoga os refresh tokens anteriores
+ * do usuário (sessão única). Senhas erradas demais bloqueiam a conta.
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -32,7 +32,7 @@ public class LoginUseCase {
     private final UnitOfWorkPort unitOfWork;
     private final Clock clock;
 
-    // A failed attempt is a DomainException: the unit of work still commits the attempt counter.
+    // Uma tentativa falha é uma DomainException: a unidade de trabalho ainda commita o contador.
     public AuthenticationResult execute(LoginCommand command) {
         return unitOfWork.execute(() -> {
             User user = verifyCredentials(command.email(), command.password());

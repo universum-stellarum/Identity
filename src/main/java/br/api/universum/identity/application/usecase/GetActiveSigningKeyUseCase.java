@@ -6,7 +6,7 @@ import br.api.universum.identity.domain.model.SigningKey;
 
 import lombok.RequiredArgsConstructor;
 
-/** Returns the active key, including the private half. For signing only; never expose it. */
+/** Devolve a chave ativa, inclusive a metade privada. Só para assinar; nunca a exponha. */
 @RequiredArgsConstructor
 public class GetActiveSigningKeyUseCase {
 

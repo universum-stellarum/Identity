@@ -1,10 +1,10 @@
 package br.api.universum.identity.domain.exception;
 
 /**
- * Base for every rule violation raised by the domain or by a use case.
+ * Base de toda violação de regra lançada pelo domínio ou por um caso de uso.
  *
- * <p>A domain exception is an expected outcome, not a failure: the unit of work commits what the
- * use case recorded before throwing it (failed login attempts, revoked sessions).</p>
+ * <p>Uma exceção de domínio é um resultado esperado, não uma falha: a unidade de trabalho commita o
+ * que o caso de uso gravou antes de lançá-la (tentativas de login falhas, sessões revogadas).</p>
  */
 public abstract class DomainException extends RuntimeException {
 

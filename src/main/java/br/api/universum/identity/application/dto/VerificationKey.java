@@ -5,9 +5,10 @@ import br.api.universum.identity.domain.model.SigningKey;
 import java.util.UUID;
 
 /**
- * The public half of the active signing key, used by other services to verify access tokens.
+ * A metade pública da chave de assinatura ativa, usada pelos outros serviços para validar os
+ * access tokens.
  *
- * @param publicKey Base64 of the X.509 encoded RSA public key
+ * @param publicKey Base64 da chave pública RSA codificada em X.509
  */
 public record VerificationKey(UUID keyId, String algorithm, String publicKey) {
 

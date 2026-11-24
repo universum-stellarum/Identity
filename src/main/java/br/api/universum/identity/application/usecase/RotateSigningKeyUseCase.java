@@ -15,8 +15,8 @@ import java.time.Clock;
 import java.util.UUID;
 
 /**
- * Replaces the active signing key. Every access token signed with the previous key stops being
- * accepted; refresh tokens remain valid, so clients only need to refresh.
+ * Substitui a chave de assinatura ativa. Todo access token assinado com a chave anterior deixa de
+ * ser aceito; os refresh tokens continuam válidos, então os clientes só precisam fazer refresh.
  */
 @RequiredArgsConstructor
 public class RotateSigningKeyUseCase {

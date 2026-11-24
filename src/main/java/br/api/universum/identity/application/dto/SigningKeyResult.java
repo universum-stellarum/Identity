@@ -5,7 +5,7 @@ import br.api.universum.identity.domain.model.SigningKey;
 import java.time.Instant;
 import java.util.UUID;
 
-/** Metadata of a signing key. Never carries key material. */
+/** Metadados de uma chave de assinatura. Nunca carrega o material da chave. */
 public record SigningKeyResult(UUID keyId, String algorithm, Instant rotatedAt) {
 
     public static SigningKeyResult from(SigningKey key) {

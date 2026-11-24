@@ -8,14 +8,14 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
 /**
- * PostgreSQL functions used by the Flyway migrations, registered in H2 (see the datasource URL in
- * {@code application-test.yaml}). The migrations themselves cannot change: they were already applied
- * in dev and prod, and Flyway validates their checksums.
+ * Funções do PostgreSQL usadas pelas migrations do Flyway, registradas no H2 (veja a URL do datasource
+ * em {@code application-test.yaml}). As migrations em si não podem mudar: já foram aplicadas em dev e
+ * prod, e o Flyway valida o checksum delas.
  */
 @UtilityClass
 public class H2PostgresFunctions {
 
-    /** {@code convert_to(text, encoding)}: the text encoded as bytes. */
+    /** {@code convert_to(text, encoding)}: o texto codificado em bytes. */
     public byte[] convertTo(String text, String encoding) {
         return text == null ? null : text.getBytes(Charset.forName(encoding));
     }
@@ -25,7 +25,7 @@ public class H2PostgresFunctions {
         return data == null ? null : MessageDigest.getInstance("SHA-256").digest(data);
     }
 
-    /** {@code encode(bytea, 'hex')}: lowercase hex, the only format the migrations use. */
+    /** {@code encode(bytea, 'hex')}: hex em minúsculas, o único formato que as migrations usam. */
     public String encode(byte[] data, String format) {
         if (data == null) {
             return null;

@@ -1,6 +1,6 @@
 package br.api.universum.identity.application.port;
 
-/** Generates the opaque value handed to the client as refresh token. */
+/** Gera o valor opaco entregue ao cliente como refresh token. */
 public interface RefreshTokenGeneratorPort {
 
     String generate();

@@ -27,8 +27,9 @@ public class SecurityConfig {
     };
 
     /**
-     * Public routes live in their own chains, without the JWT resource server: a stale Authorization
-     * header must not turn them into 401 (login, refresh and logout exist precisely to recover from it).
+     * As rotas públicas ficam numa cadeia própria, sem o resource server de JWT: um header
+     * Authorization vencido não pode transformá-las em 401 (login, refresh e logout existem
+     * justamente para recuperar dessa situação).
      */
     @Bean
     @Order(1)

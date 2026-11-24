@@ -10,7 +10,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-/** Decodes the Base64 key formats stored in the database. */
+/** Decodifica os formatos de chave em Base64 gravados no banco. */
 @UtilityClass
 class RsaKeys {
 

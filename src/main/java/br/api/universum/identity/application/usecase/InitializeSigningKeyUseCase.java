@@ -12,8 +12,8 @@ import java.time.Clock;
 import java.util.UUID;
 
 /**
- * Returns the active signing key, generating the first pair if none exists yet. Called at startup;
- * the lock guarantees that instances starting together end up with the same key.
+ * Devolve a chave de assinatura ativa e gera o primeiro par se ainda não houver nenhum. Chamado na
+ * inicialização; o bloqueio garante que instâncias subindo ao mesmo tempo fiquem com a mesma chave.
  */
 @RequiredArgsConstructor
 public class InitializeSigningKeyUseCase {

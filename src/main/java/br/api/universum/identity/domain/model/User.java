@@ -28,7 +28,7 @@ public class User extends AuditableEntity {
     public static final int MAX_FAILED_ATTEMPTS = 5;
     public static final Duration LOCK_DURATION = Duration.ofMinutes(15);
 
-    /** Generated on first save; {@code null} until then. */
+    /** Gerado no primeiro save; {@code null} até lá. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -63,7 +63,7 @@ public class User extends AuditableEntity {
         );
     }
 
-    /** Rebuilds a user in a known state, as it would come from storage. */
+    /** Reconstrói um usuário num estado conhecido, como viria do armazenamento. */
     public static User restore(UUID id, String email, String encodedPassword, String name, String roles,
                                int failedAttempts, Instant lockExpiredAt) {
         return new User(id, email, encodedPassword, name, roles, failedAttempts, lockExpiredAt);

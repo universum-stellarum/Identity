@@ -10,7 +10,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 
 /**
- * Guards the dependency rule of the clean architecture: source code dependencies point inwards only.
+ * Garante a regra de dependência da arquitetura limpa: as dependências do código só apontam para dentro.
  *
  * <pre>
  * presentation ─┐
@@ -52,15 +52,15 @@ class ArchitectureTest {
                         "io.swagger..",
                         "com.fasterxml.."
                 )
-                .because("frameworks are details: they belong to infrastructure and presentation")
+                .because("frameworks são detalhes: pertencem à infraestrutura e à apresentação")
                 .check(CLASSES);
     }
 
     /**
-     * The domain models are also the JPA entities, so the standard mapping annotations
-     * ({@code jakarta.persistence}) are allowed. Nothing vendor specific (Hibernate, Spring Data) is.
-     * Lombok runs at compile time and only leaves {@code @lombok.Generated} (CLASS retention,
-     * never loaded at runtime) on the generated getters and constructors.
+     * Os modelos do domínio também são as entidades JPA, então as anotações de mapeamento do padrão
+     * ({@code jakarta.persistence}) são permitidas. Nada específico de fornecedor (Hibernate, Spring
+     * Data) é. O Lombok atua na compilação e só deixa {@code @lombok.Generated} (retenção CLASS,
+     * nunca carregada em execução) nos getters e construtores gerados.
      */
     @Test
     void domainDependsOnlyOnTheJpaStandard() {

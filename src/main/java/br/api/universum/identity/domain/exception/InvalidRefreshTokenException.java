@@ -1,6 +1,6 @@
 package br.api.universum.identity.domain.exception;
 
-/** Indicates that the given refresh token is invalid, already revoked, or expired. */
+/** Indica que o refresh token informado é inválido, já foi revogado ou expirou. */
 public class InvalidRefreshTokenException extends BusinessException {
 
     public InvalidRefreshTokenException() {

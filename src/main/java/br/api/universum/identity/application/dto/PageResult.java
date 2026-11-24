@@ -3,7 +3,7 @@ package br.api.universum.identity.application.dto;
 import java.util.List;
 import java.util.function.Function;
 
-/** One page of results, along with the total number of elements across all pages. */
+/** Uma página de resultados, com o total de elementos somando todas as páginas. */
 public record PageResult<T>(List<T> content, PageQuery query, long totalElements) {
 
     public PageResult {

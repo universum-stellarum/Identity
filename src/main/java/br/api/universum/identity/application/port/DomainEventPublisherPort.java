@@ -4,6 +4,6 @@ import br.api.universum.identity.domain.event.DomainEvent;
 
 public interface DomainEventPublisherPort {
 
-    /** Listeners are notified only after the current unit of work commits. */
+    /** Os listeners só são notificados depois do commit da unidade de trabalho atual. */
     void publish(DomainEvent event);
 }

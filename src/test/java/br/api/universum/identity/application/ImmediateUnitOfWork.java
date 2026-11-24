@@ -4,7 +4,7 @@ import br.api.universum.identity.application.port.UnitOfWorkPort;
 
 import java.util.function.Supplier;
 
-/** Runs the work right away, without a transaction. For use case unit tests. */
+/** Executa o trabalho na hora, sem transação. Para os testes unitários dos casos de uso. */
 public class ImmediateUnitOfWork implements UnitOfWorkPort {
 
     @Override

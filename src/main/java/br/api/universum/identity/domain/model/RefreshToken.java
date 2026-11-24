@@ -25,7 +25,7 @@ import static br.api.universum.identity.domain.model.Guard.requireText;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RefreshToken extends AuditableEntity {
 
-    /** Generated on first save; {@code null} until then. */
+    /** Gerado no primeiro save; {@code null} até lá. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -53,7 +53,7 @@ public class RefreshToken extends AuditableEntity {
         );
     }
 
-    /** Rebuilds a token in a known state, as it would come from storage. */
+    /** Reconstrói um token num estado conhecido, como viria do armazenamento. */
     public static RefreshToken restore(UUID id, String tokenHash, UUID userId, Instant expiryDate, boolean revoked) {
         return new RefreshToken(id, tokenHash, userId, expiryDate, revoked);
     }

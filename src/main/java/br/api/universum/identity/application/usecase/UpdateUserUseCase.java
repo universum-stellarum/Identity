@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
-/** Changes email, name and roles of any user. */
+/** Altera e-mail, nome e papéis (roles) de qualquer usuário. */
 @RequiredArgsConstructor
 public class UpdateUserUseCase {
 

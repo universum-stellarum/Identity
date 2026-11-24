@@ -14,7 +14,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Map;
 
-/** Builds the JWK Set document (RFC 7517) that publishes the verification key. */
+/** Monta o documento JWK Set (RFC 7517) que publica a chave de verificação. */
 @UtilityClass
 public class JwkSetResponse {
 

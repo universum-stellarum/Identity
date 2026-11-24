@@ -1,6 +1,6 @@
 package br.api.universum.identity.domain.exception;
 
-/** Indicates that a resource was not found. */
+/** Indica que um recurso não foi encontrado. */
 public class ResourceNotFoundException extends DomainException {
 
     public ResourceNotFoundException(String message) {

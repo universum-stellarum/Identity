@@ -8,7 +8,7 @@ import lombok.Getter;
 
 import java.time.Instant;
 
-/** Fills {@code created_at} / {@code updated_at} through JPA lifecycle callbacks. */
+/** Preenche {@code created_at} / {@code updated_at} pelos callbacks de ciclo de vida do JPA. */
 @Getter
 @MappedSuperclass
 public abstract class AuditableEntity {

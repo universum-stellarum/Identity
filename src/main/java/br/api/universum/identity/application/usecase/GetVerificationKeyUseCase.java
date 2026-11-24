@@ -6,7 +6,7 @@ import br.api.universum.identity.application.port.UnitOfWorkPort;
 
 import lombok.RequiredArgsConstructor;
 
-/** Returns only the public half of the active key, the one published for token verification. */
+/** Devolve só a metade pública da chave ativa, a que é publicada para validar os tokens. */
 @RequiredArgsConstructor
 public class GetVerificationKeyUseCase {
 

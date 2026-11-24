@@ -7,8 +7,8 @@ import br.api.universum.identity.application.port.UnitOfWorkPort;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Revokes the given refresh token. Idempotent: an unknown or already revoked token is ignored.
- * The access token is not revoked; it expires on its own.
+ * Revoga o refresh token informado. Idempotente: um token desconhecido ou já revogado é ignorado.
+ * O access token não é revogado; ele expira sozinho.
  */
 @RequiredArgsConstructor
 public class LogoutUseCase {

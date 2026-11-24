@@ -1,6 +1,6 @@
 package br.api.universum.identity.application.port;
 
-/** One-way hash used to store and look up refresh tokens without persisting their value. */
+/** Hash de mão única usado para guardar e localizar refresh tokens sem persistir o valor. */
 public interface TokenHasherPort {
 
     String hash(String rawToken);

@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class H2PostgresFunctionsTest {
 
-    /** Migration V3 must produce the same hash the application computes for a refresh token. */
+    /** A migration V3 precisa gerar o mesmo hash que a aplicação calcula para um refresh token. */
     @Test
     void reproducesTheHashOfMigrationV3() throws Exception {
         String token = "3f1c2a9e-legacy-refresh-token";

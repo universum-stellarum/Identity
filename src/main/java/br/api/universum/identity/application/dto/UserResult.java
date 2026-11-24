@@ -4,7 +4,7 @@ import br.api.universum.identity.domain.model.User;
 
 import java.util.UUID;
 
-/** Public view of a user: never carries the password hash or the lock state. */
+/** Visão pública de um usuário: nunca carrega o hash da senha nem o estado de bloqueio. */
 public record UserResult(UUID id, String email, String name, String roles) {
 
     public static UserResult from(User user) {

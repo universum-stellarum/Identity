@@ -10,11 +10,11 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.util.function.Supplier;
 
 /**
- * {@link UnitOfWorkPort} backed by Spring transactions. Joins the current transaction when there is one.
+ * {@link UnitOfWorkPort} sobre as transações do Spring. Participa da transação atual, se houver.
  *
- * <p>A {@link DomainException} is caught inside the transaction, so the transaction commits, and is
- * rethrown afterwards (the equivalent of {@code @Transactional(noRollbackFor = DomainException.class)}).
- * Any other exception rolls back.</p>
+ * <p>Uma {@link DomainException} é capturada dentro da transação, para que ela seja commitada, e
+ * relançada em seguida (equivale a {@code @Transactional(noRollbackFor = DomainException.class)}).
+ * Qualquer outra exceção faz rollback.</p>
  */
 @Component
 public class TransactionalUnitOfWork implements UnitOfWorkPort {

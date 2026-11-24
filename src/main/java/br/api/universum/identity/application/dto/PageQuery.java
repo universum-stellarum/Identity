@@ -3,9 +3,9 @@ package br.api.universum.identity.application.dto;
 import java.util.List;
 
 /**
- * A page request: zero-based page number, page size and sort order.
+ * Pedido de uma página: número da página (a partir de zero), tamanho e ordenação.
  *
- * @param sort sort orders by property name, applied in sequence
+ * @param sort ordenações por nome de propriedade, aplicadas em sequência
  */
 public record PageQuery(int page, int size, List<SortOrder> sort) {
 

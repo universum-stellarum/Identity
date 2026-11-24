@@ -20,7 +20,7 @@ class TokenSecretsTest {
 
     @Test
     void hashIsSha256InLowercaseHex() {
-        // echo -n "abc" | sha256sum
+        // mesmo valor de: echo -n "abc" | sha256sum
         assertThat(new Sha256TokenHasher().hash("abc"))
                 .isEqualTo("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
     }

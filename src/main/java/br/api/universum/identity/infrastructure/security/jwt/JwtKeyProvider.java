@@ -22,8 +22,8 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Builds the {@link JwtEncoder} and {@link JwtDecoder} from the key stored in the database and keeps
- * them cached for a few seconds. Other instances pick a rotated key up when their cache expires.
+ * Monta o {@link JwtEncoder} e o {@link JwtDecoder} a partir da chave gravada no banco e os mantém em
+ * cache por alguns segundos. As outras instâncias pegam uma chave rotacionada quando o cache delas expira.
  */
 @Component
 public class JwtKeyProvider {
@@ -60,7 +60,7 @@ public class JwtKeyProvider {
 
     @TransactionalEventListener
     public synchronized void onKeyRotated(SigningKeyRotated event) {
-        // Executed after commit: never cache key material from a rolled-back rotation.
+        // Executado após o commit: nunca guardar em cache a chave de uma rotação desfeita (rollback).
         cached.set(null);
     }
 

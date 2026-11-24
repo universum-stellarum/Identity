@@ -1,6 +1,6 @@
 package br.api.universum.identity.domain.exception;
 
-/** Indicates a business rule conflict. */
+/** Indica um conflito com uma regra de negócio. */
 public class ConflictException extends DomainException {
 
     public ConflictException(String message) {

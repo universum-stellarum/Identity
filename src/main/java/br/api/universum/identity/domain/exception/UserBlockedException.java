@@ -1,6 +1,6 @@
 package br.api.universum.identity.domain.exception;
 
-/** Indicates that the user's account is temporarily locked due to too many failed login attempts. */
+/** Indica que a conta do usuário está temporariamente bloqueada por excesso de tentativas de login falhas. */
 public class UserBlockedException extends BusinessException {
 
     public UserBlockedException() {

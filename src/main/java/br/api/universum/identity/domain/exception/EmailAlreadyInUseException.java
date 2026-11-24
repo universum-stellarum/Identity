@@ -1,6 +1,6 @@
 package br.api.universum.identity.domain.exception;
 
-/** Indicates that the given email is already registered to another user. */
+/** Indica que o e-mail informado já está cadastrado para outro usuário. */
 public class EmailAlreadyInUseException extends ConflictException {
 
     public EmailAlreadyInUseException() {

@@ -2,7 +2,7 @@ package br.api.universum.identity.application.port;
 
 import br.api.universum.identity.domain.model.User;
 
-/** Issues the signed access token (JWT) that identifies the user to the other services. */
+/** Emite o access token assinado (JWT) que identifica o usuário para os outros serviços. */
 public interface AccessTokenIssuerPort {
 
     AccessToken issue(User user);

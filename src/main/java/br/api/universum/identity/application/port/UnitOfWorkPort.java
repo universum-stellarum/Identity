@@ -3,13 +3,13 @@ package br.api.universum.identity.application.port;
 import java.util.function.Supplier;
 
 /**
- * Transaction boundary of a use case.
+ * Fronteira transacional de um caso de uso.
  *
- * <p>Everything done inside the block is committed or rolled back together. A
- * {@link br.api.universum.identity.domain.exception.DomainException} is an expected outcome, so it
- * <strong>commits</strong> what was recorded before it and is then rethrown: a failed login keeps the
- * attempt counter, and reusing a revoked refresh token keeps the revocation of every session. Any
- * other exception rolls the block back.</p>
+ * <p>Tudo o que é feito dentro do bloco é commitado ou desfeito junto. Uma
+ * {@link br.api.universum.identity.domain.exception.DomainException} é um resultado esperado, então
+ * ela <strong>commita</strong> o que foi gravado antes dela e depois é relançada: um login com senha
+ * errada mantém o contador de tentativas, e o reuso de um refresh token revogado mantém a revogação
+ * de todas as sessões. Qualquer outra exceção desfaz o bloco (rollback).</p>
  */
 public interface UnitOfWorkPort {
 
@@ -17,6 +17,6 @@ public interface UnitOfWorkPort {
 
     void run(Runnable work);
 
-    /** Same as {@link #execute(Supplier)}, for blocks that only read. */
+    /** Igual a {@link #execute(Supplier)}, para blocos que só fazem leitura. */
     <T> T read(Supplier<T> query);
 }

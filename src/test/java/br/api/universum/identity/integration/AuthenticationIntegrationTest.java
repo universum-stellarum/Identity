@@ -62,7 +62,7 @@ class AuthenticationIntegrationTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
-    // User registration is a protected endpoint, so the tests need a valid JWT to create users
+    // O cadastro de usuário é protegido, então os testes precisam de um JWT válido para criar usuários
     private String registrarAuthHeader;
 
     @BeforeEach
@@ -74,7 +74,7 @@ class AuthenticationIntegrationTest {
 
     @Test
     void shouldPerformFullAuthenticationLifecycle() throws Exception {
-        // 1. Register a user
+        // 1. Cadastra um usuário
         RegisterUserRequest registerRequest = new RegisterUserRequest("test@universum.api.br", "secret123", "John Doe");
 
         mockMvc.perform(post("/identity/api/v1/users/register")
@@ -87,11 +87,11 @@ class AuthenticationIntegrationTest {
                 .andExpect(jsonPath("$.name", is("John Doe")))
                 .andExpect(jsonPath("$.roles", is("ROLE_USER")));
 
-        // 2. Try to access /identity/api/v1/users/me without a token (should return 401 Unauthorized)
+        // 2. Tenta acessar /identity/api/v1/users/me sem token (deve retornar 401 Unauthorized)
         mockMvc.perform(get("/identity/api/v1/users/me"))
                 .andExpect(status().isUnauthorized());
 
-        // 3. Log in and obtain the token pair
+        // 3. Faz login e obtém o par de tokens
         LoginRequest loginRequest = new LoginRequest("test@universum.api.br", "secret123");
 
         MvcResult loginResult = mockMvc.perform(post("/identity/api/v1/auth/login")
@@ -108,14 +108,14 @@ class AuthenticationIntegrationTest {
         String accessToken = objectMapper.readTree(responseContent).get("accessToken").asText();
         String refreshToken = objectMapper.readTree(responseContent).get("refreshToken").asText();
 
-        // 4. Access /identity/api/v1/users/me using the access token (should return the user's data)
+        // 4. Acessa /identity/api/v1/users/me com o access token (deve retornar os dados do usuário)
         mockMvc.perform(get("/identity/api/v1/users/me")
                         .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email", is("test@universum.api.br")))
                 .andExpect(jsonPath("$.name", is("John Doe")));
 
-        // 5. Use the refresh token to obtain new tokens
+        // 5. Usa o refresh token para obter novos tokens
         RefreshTokenRequest refreshRequest = new RefreshTokenRequest(refreshToken);
 
         MvcResult refreshResult = mockMvc.perform(post("/identity/api/v1/auth/refresh")
@@ -130,13 +130,13 @@ class AuthenticationIntegrationTest {
         String newResponseContent = refreshResult.getResponse().getContentAsString();
         String newAccessToken = objectMapper.readTree(newResponseContent).get("accessToken").asText();
 
-        // 6. Try to use the old refresh token again (should fail due to rotation/revocation)
+        // 6. Tenta usar o refresh token antigo de novo (deve falhar por causa da rotação/revogação)
         mockMvc.perform(post("/identity/api/v1/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(refreshRequest)))
                 .andExpect(status().isBadRequest());
 
-        // 7. Use the new access token to call the protected endpoint
+        // 7. Usa o novo access token para chamar o endpoint protegido
         mockMvc.perform(get("/identity/api/v1/users/me")
                         .header("Authorization", "Bearer " + newAccessToken))
                 .andExpect(status().isOk())
@@ -145,7 +145,7 @@ class AuthenticationIntegrationTest {
 
     @Test
     void shouldLockAccountAfterFiveFailedAttempts() throws Exception {
-        // 1. Register user
+        // 1. Cadastra o usuário
         RegisterUserRequest registerRequest = new RegisterUserRequest("lock@universum.api.br", "secret123", "Locked User");
 
         mockMvc.perform(post("/identity/api/v1/users/register")
@@ -154,7 +154,7 @@ class AuthenticationIntegrationTest {
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated());
 
-        // 2. Try to log in with the wrong password 4 times in a row (should not lock yet)
+        // 2. Tenta logar com a senha errada 4 vezes seguidas (ainda não deve bloquear)
         LoginRequest wrongLoginRequest = new LoginRequest("lock@universum.api.br", "wrongpassword");
 
         for (int i = 0; i < 4; i++) {
@@ -165,14 +165,14 @@ class AuthenticationIntegrationTest {
                     .andExpect(jsonPath("$.detail", is("Invalid credentials.")));
         }
 
-        // 3. The 5th failed attempt should trigger the temporary lock
+        // 3. A 5ª tentativa falha deve disparar o bloqueio temporário
         mockMvc.perform(post("/identity/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(wrongLoginRequest)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.detail", containsString("locked")));
 
-        // 4. Try to log in with the CORRECT password (should still be locked)
+        // 4. Tenta logar com a senha CORRETA (deve continuar bloqueado)
         LoginRequest correctLoginRequest = new LoginRequest("lock@universum.api.br", "secret123");
 
         mockMvc.perform(post("/identity/api/v1/auth/login")
@@ -184,7 +184,7 @@ class AuthenticationIntegrationTest {
 
     @Test
     void shouldPerformFullUserCrud() throws Exception {
-        // 1. Register an admin and obtain a token to authorize the CRUD endpoints
+        // 1. Cadastra um admin e obtém um token para autorizar os endpoints do CRUD
         RegisterUserRequest adminRegister = new RegisterUserRequest("admin@universum.api.br", "admin123", "Admin User");
 
         mockMvc.perform(post("/identity/api/v1/users/register")
@@ -202,7 +202,7 @@ class AuthenticationIntegrationTest {
         String token = objectMapper.readTree(loginResult.getResponse().getContentAsString()).get("accessToken").asText();
         String authHeader = "Bearer " + token;
 
-        // 2. Create a new user via the CRUD endpoint (registering another user)
+        // 2. Cria um novo usuário pelo endpoint do CRUD (cadastrando outro usuário)
         RegisterUserRequest userRequest = new RegisterUserRequest("crud@universum.api.br", "crud123", "Crud User");
 
         MvcResult createResult = mockMvc.perform(post("/identity/api/v1/users/register")
@@ -214,20 +214,20 @@ class AuthenticationIntegrationTest {
 
         String newUserId = objectMapper.readTree(createResult.getResponse().getContentAsString()).get("id").asText();
 
-        // 3. Fetch user by ID
+        // 3. Busca o usuário pelo id
         mockMvc.perform(get("/identity/api/v1/users/" + newUserId)
                         .header("Authorization", authHeader))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email", is("crud@universum.api.br")))
                 .andExpect(jsonPath("$.name", is("Crud User")));
 
-        // 4. List all users (paginated)
+        // 4. Lista todos os usuários (paginado)
         mockMvc.perform(get("/identity/api/v1/users")
                         .header("Authorization", authHeader))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(2))));
 
-        // 5. Update user data
+        // 5. Atualiza os dados do usuário
         UpdateUserRequest updateRequest = new UpdateUserRequest("crud_updated@universum.api.br", "Crud User Updated", "ROLE_ADMIN");
 
         mockMvc.perform(put("/identity/api/v1/users/" + newUserId)
@@ -239,12 +239,12 @@ class AuthenticationIntegrationTest {
                 .andExpect(jsonPath("$.email", is("crud_updated@universum.api.br")))
                 .andExpect(jsonPath("$.roles", is("ROLE_ADMIN")));
 
-        // 6. Delete user by ID
+        // 6. Remove o usuário pelo id
         mockMvc.perform(delete("/identity/api/v1/users/" + newUserId)
                         .header("Authorization", authHeader))
                 .andExpect(status().isNoContent());
 
-        // 7. Fetch the deleted user (should return 404 Not Found through our exception)
+        // 7. Busca o usuário removido (deve retornar 404 Not Found pela nossa exceção)
         mockMvc.perform(get("/identity/api/v1/users/" + newUserId)
                         .header("Authorization", authHeader))
                 .andExpect(status().isNotFound())
@@ -253,7 +253,7 @@ class AuthenticationIntegrationTest {
 
     @Test
     void shouldRejectInvalidPayloadsWithBadRequest() throws Exception {
-        // 1. Registration with blank password and invalid email
+        // 1. Cadastro com senha em branco e e-mail inválido
         mockMvc.perform(post("/identity/api/v1/users/register")
                         .header("Authorization", registrarAuthHeader)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -262,21 +262,21 @@ class AuthenticationIntegrationTest {
                 .andExpect(jsonPath("$.errors.email", is("Invalid email.")))
                 .andExpect(jsonPath("$.errors.password", is("Password is required.")));
 
-        // 2. Login without a password
+        // 2. Login sem senha
         mockMvc.perform(post("/identity/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new LoginRequest("john@universum.api.br", null))))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors.password", is("Password is required.")));
 
-        // 3. Refresh without a token
+        // 3. Refresh sem token
         mockMvc.perform(post("/identity/api/v1/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new RefreshTokenRequest(null))))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors.refreshToken", is("Refresh token is required.")));
 
-        // 4. Update with missing fields (requires authentication)
+        // 4. Atualização com campos faltando (exige autenticação)
         mockMvc.perform(post("/identity/api/v1/users/register")
                         .header("Authorization", registrarAuthHeader)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -307,14 +307,14 @@ class AuthenticationIntegrationTest {
 
     @Test
     void shouldRejectMalformedRequestsWithBadRequest() throws Exception {
-        // 1. Broken JSON in the body
+        // 1. JSON quebrado no corpo
         mockMvc.perform(post("/identity/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"email\": \"john@universum.api.br\", "))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.detail", is("Missing or malformed request body.")));
 
-        // 2. Non-UUID ID in the path (requires authentication)
+        // 2. Id que não é UUID no caminho (exige autenticação)
         mockMvc.perform(post("/identity/api/v1/users/register")
                         .header("Authorization", registrarAuthHeader)
                         .contentType(MediaType.APPLICATION_JSON)

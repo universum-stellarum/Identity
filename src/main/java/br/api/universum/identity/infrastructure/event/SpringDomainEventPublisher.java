@@ -8,8 +8,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 /**
- * Publishes domain events as Spring application events. Listeners use
- * {@code @TransactionalEventListener}, so they only run after the unit of work commits.
+ * Publica os eventos de domínio como eventos de aplicação do Spring. Os listeners usam
+ * {@code @TransactionalEventListener}, então só rodam depois do commit da unidade de trabalho.
  */
 @Component
 @RequiredArgsConstructor
