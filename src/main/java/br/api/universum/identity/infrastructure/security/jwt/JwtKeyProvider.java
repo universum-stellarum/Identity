@@ -1,0 +1,96 @@
+package br.api.universum.identity.infrastructure.security.jwt;
+
+import br.api.universum.identity.application.usecase.GetActiveSigningKeyUseCase;
+import br.api.universum.identity.application.usecase.InitializeSigningKeyUseCase;
+import br.api.universum.identity.domain.event.SigningKeyRotated;
+import br.api.universum.identity.domain.model.SigningKey;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
+import org.springframework.security.oauth2.jwt.JwsHeader;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionalEventListener;
+
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+
+/**
+ * Builds the {@link JwtEncoder} and {@link JwtDecoder} from the key stored in the database and keeps
+ * them cached for a few seconds. Other instances pick a rotated key up when their cache expires.
+ */
+@Component
+public class JwtKeyProvider {
+
+    private static final Duration CACHE_TTL = Duration.ofSeconds(5);
+
+    private final GetActiveSigningKeyUseCase activeKey;
+    private final Clock clock;
+    private final JwtKeyMaterialFactory materialFactory;
+    private final AtomicReference<CachedKey> cached = new AtomicReference<>();
+
+    @Autowired
+    public JwtKeyProvider(InitializeSigningKeyUseCase initializeKey,
+                          GetActiveSigningKeyUseCase activeKey,
+                          Clock clock,
+                          @Value("${app.jwt.issuer}") String issuer) {
+        this.activeKey = activeKey;
+        this.clock = clock;
+        this.materialFactory = new JwtKeyMaterialFactory(issuer);
+        this.cached.set(load(initializeKey.execute(), clock.instant().plus(CACHE_TTL)));
+    }
+
+    public JwtEncoder jwtEncoder() {
+        return parameters -> {
+            CachedKey key = current();
+            JwsHeader header = JwsHeader.with(SignatureAlgorithm.RS256).keyId(key.id().toString()).build();
+            return key.encoder().encode(JwtEncoderParameters.from(header, parameters.getClaims()));
+        };
+    }
+
+    public JwtDecoder jwtDecoder() {
+        return token -> current().decoder().decode(token);
+    }
+
+    @TransactionalEventListener
+    public synchronized void onKeyRotated(SigningKeyRotated event) {
+        // Executed after commit: never cache key material from a rolled-back rotation.
+        cached.set(null);
+    }
+
+    private CachedKey current() {
+        CachedKey key = cached.get();
+        if (key != null && clock.instant().isBefore(key.expiresAt())) {
+            return key;
+        }
+        return refresh();
+    }
+
+    private synchronized CachedKey refresh() {
+        Instant now = clock.instant();
+        CachedKey key = cached.get();
+        if (key != null && now.isBefore(key.expiresAt())) {
+            return key;
+        }
+        SigningKey stored = activeKey.execute();
+        CachedKey refreshed = key != null && key.id().equals(stored.getKeyId())
+                ? new CachedKey(key.id(), key.encoder(), key.decoder(), now.plus(CACHE_TTL))
+                : load(stored, now.plus(CACHE_TTL));
+        cached.set(refreshed);
+        return refreshed;
+    }
+
+    private CachedKey load(SigningKey stored, Instant expiresAt) {
+        JwtKeyMaterial material = materialFactory.create(stored);
+        return new CachedKey(material.id(), material.encoder(), material.decoder(), expiresAt);
+    }
+
+    private record CachedKey(UUID id, JwtEncoder encoder, JwtDecoder decoder, Instant expiresAt) {
+    }
+}
