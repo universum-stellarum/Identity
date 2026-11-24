@@ -39,7 +39,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/identity/api/v1/users")
 @RequiredArgsConstructor
-@Tag(name = "Users", description = "Endpoints for managing (CRUD) users in the system")
+@Tag(name = "Usuários", description = "Cadastro, consulta, alteração e remoção de usuários")
 public class UserController {
 
     private final RegisterUserUseCase registerUser;
@@ -52,41 +52,45 @@ public class UserController {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(
-            summary = "Register a new user",
-            description = "Creates a new regular user in the database. Requires JWT authentication."
+            summary = "Cadastra um novo usuário",
+            description = "Cria um usuário comum. Exige autenticação JWT."
     )
-    @ApiResponse(responseCode = "201", description = "User registered successfully")
-    @ApiResponse(responseCode = "400", description = "Email already in use or invalid payload")
-    @ApiResponse(responseCode = "401", description = "Unauthorized")
+    @ApiResponse(responseCode = "201", description = "Usuário cadastrado")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "409", description = "E-mail já está em uso")
+    @ApiResponse(responseCode = "401", description = "Não autenticado")
     public UserResponse register(@Valid @RequestBody RegisterUserRequest request) {
         return UserResponse.from(registerUser.execute(request.toCommand()));
     }
 
     @GetMapping("/me")
     @Operation(
-            summary = "Get current user data",
-            description = "Retrieves the profile details of the currently authenticated user from the JWT."
+            summary = "Dados do usuário autenticado",
+            description = "Retorna os dados do usuário identificado pelo JWT."
     )
-    @ApiResponse(responseCode = "200", description = "Data retrieved successfully")
-    @ApiResponse(responseCode = "401", description = "Unauthorized / missing or invalid JWT token")
+    @ApiResponse(responseCode = "200", description = "Dados retornados")
+    @ApiResponse(responseCode = "401", description = "JWT ausente ou inválido")
     public UserResponse me(@CurrentUserId UUID userId) {
         return UserResponse.from(getUser.execute(userId));
     }
 
     @GetMapping
     @Operation(
-            summary = "List all users",
-            description = "Returns a page with registered users. Requires JWT authentication."
+            summary = "Lista os usuários",
+            description = "Retorna uma página com os usuários cadastrados. Exige autenticação JWT."
     )
-    @ApiResponse(responseCode = "200", description = "Page returned successfully")
-    @ApiResponse(responseCode = "401", description = "Unauthorized")
+    @ApiResponse(responseCode = "200", description = "Página retornada")
+    @ApiResponse(responseCode = "401", description = "Não autenticado")
     public Page<UserResponse> listAll(@PageableDefault(size = 20) Pageable pageable) {
         PageResult<UserResponse> page = listUsers.execute(toQuery(pageable)).map(UserResponse::from);
         return new PageImpl<>(page.content(), pageable, page.totalElements());
     }
 
     @PutMapping("/me")
-    @Operation(summary = "Update own profile", description = "Updates name and email without changing roles.")
+    @Operation(summary = "Atualiza o próprio perfil", description = "Altera nome e e-mail, sem mudar os papéis (roles).")
+    @ApiResponse(responseCode = "200", description = "Perfil atualizado")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponse(responseCode = "409", description = "E-mail já está em uso")
     public UserResponse updateProfile(@CurrentUserId UUID userId,
                                       @Valid @RequestBody UpdateProfileRequest request) {
         return UserResponse.from(updateProfile.execute(userId, request.toCommand()));
@@ -94,24 +98,27 @@ public class UserController {
 
     @GetMapping("/{id}")
     @Operation(
-            summary = "Find user by ID",
-            description = "Returns the details of a specific user by their unique ID."
+            summary = "Busca um usuário pelo id",
+            description = "Retorna os dados de um usuário pelo id."
     )
-    @ApiResponse(responseCode = "200", description = "User found successfully")
-    @ApiResponse(responseCode = "400", description = "User not found")
-    @ApiResponse(responseCode = "401", description = "Unauthorized")
+    @ApiResponse(responseCode = "200", description = "Usuário encontrado")
+    @ApiResponse(responseCode = "400", description = "Id inválido")
+    @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    @ApiResponse(responseCode = "401", description = "Não autenticado")
     public UserResponse getById(@PathVariable UUID id) {
         return UserResponse.from(getUser.execute(id));
     }
 
     @PutMapping("/{id}")
     @Operation(
-            summary = "Update user data",
-            description = "Modifies the email, name, and roles of an existing user."
+            summary = "Atualiza um usuário",
+            description = "Altera e-mail, nome e papéis (roles) de um usuário existente."
     )
-    @ApiResponse(responseCode = "200", description = "User updated successfully")
-    @ApiResponse(responseCode = "400", description = "Invalid ID, email already in use, or inconsistent data")
-    @ApiResponse(responseCode = "401", description = "Unauthorized")
+    @ApiResponse(responseCode = "200", description = "Usuário atualizado")
+    @ApiResponse(responseCode = "400", description = "Id ou dados inválidos")
+    @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    @ApiResponse(responseCode = "409", description = "E-mail já está em uso")
+    @ApiResponse(responseCode = "401", description = "Não autenticado")
     public UserResponse update(@PathVariable UUID id, @Valid @RequestBody UpdateUserRequest request) {
         return UserResponse.from(updateUser.execute(id, request.toCommand()));
     }
@@ -119,12 +126,13 @@ public class UserController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(
-            summary = "Delete a user",
-            description = "Physically removes a specific user's record by their unique ID."
+            summary = "Remove um usuário",
+            description = "Remove definitivamente o registro do usuário pelo id."
     )
-    @ApiResponse(responseCode = "204", description = "User deleted successfully")
-    @ApiResponse(responseCode = "400", description = "User not found")
-    @ApiResponse(responseCode = "401", description = "Unauthorized")
+    @ApiResponse(responseCode = "204", description = "Usuário removido")
+    @ApiResponse(responseCode = "400", description = "Id inválido")
+    @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    @ApiResponse(responseCode = "401", description = "Não autenticado")
     public void delete(@PathVariable UUID id) {
         deleteUser.execute(id);
     }

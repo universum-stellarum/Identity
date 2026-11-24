@@ -18,7 +18,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Universum Stellarum Identity API")
                         .version("v1.0.0")
-                        .description("Authentication and user identity service"))
+                        .description("Serviço de autenticação e identidade dos usuários"))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName,
@@ -27,6 +27,6 @@ public class OpenApiConfig {
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
                                         .bearerFormat("JWT")
-                                        .description("Enter your Bearer JWT token to access protected routes")));
+                                        .description("Informe o token JWT (Bearer) para acessar as rotas protegidas")));
     }
 }

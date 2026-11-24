@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/identity/api/v1/auth")
 @RequiredArgsConstructor
-@Tag(name = "Authentication", description = "Endpoints for login and token (JWT) renewal")
+@Tag(name = "Autenticação", description = "Login, renovação e logout dos tokens (JWT)")
 public class AuthController {
 
     private final LoginUseCase login;
@@ -34,37 +34,40 @@ public class AuthController {
 
     @PostMapping("/keys")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Generate a new JWT signing key",
-            description = "Requires authentication. Replaces the active key and invalidates existing access tokens. "
-                    + "Only key metadata is returned; refresh tokens remain usable.")
+    @Operation(summary = "Gera uma nova chave de assinatura dos JWT",
+            description = "Exige autenticação. Substitui a chave ativa e invalida os access tokens existentes. "
+                    + "Só os metadados da chave são retornados; os refresh tokens continuam válidos.")
     public JwtKeyResponse generateKeys() {
         return JwtKeyResponse.from(rotateSigningKey.execute());
     }
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Faz logout",
+            description = "Revoga o refresh token informado. Idempotente; o access token expira sozinho.")
+    @ApiResponse(responseCode = "204", description = "Logout realizado")
     public void logout(@Valid @RequestBody RefreshTokenRequest request) {
         logout.execute(request.refreshToken());
     }
 
     @PostMapping("/login")
     @Operation(
-            summary = "Log in",
-            description = "Authenticates email/password and issues a token pair (JWT access token + refresh token)"
+            summary = "Faz login",
+            description = "Autentica e-mail e senha e emite um par de tokens (access token JWT + refresh token)"
     )
-    @ApiResponse(responseCode = "200", description = "Login successful")
-    @ApiResponse(responseCode = "400", description = "Invalid credentials or account temporarily locked")
+    @ApiResponse(responseCode = "200", description = "Login realizado")
+    @ApiResponse(responseCode = "400", description = "Credenciais inválidas ou conta temporariamente bloqueada")
     public TokenResponse login(@Valid @RequestBody LoginRequest request) {
         return TokenResponse.from(login.execute(request.toCommand()));
     }
 
     @PostMapping("/refresh")
     @Operation(
-            summary = "Refresh access token",
-            description = "Validates the given refresh token, revokes it for rotation security, and issues new tokens"
+            summary = "Renova o access token",
+            description = "Valida o refresh token informado, revoga-o (rotação) e emite novos tokens"
     )
-    @ApiResponse(responseCode = "200", description = "Refresh successful")
-    @ApiResponse(responseCode = "400", description = "Invalid, expired, or already revoked refresh token")
+    @ApiResponse(responseCode = "200", description = "Tokens renovados")
+    @ApiResponse(responseCode = "400", description = "Refresh token inválido, expirado ou já revogado")
     public TokenResponse refresh(@Valid @RequestBody RefreshTokenRequest request) {
         return TokenResponse.from(refreshSession.execute(request.refreshToken()));
     }
