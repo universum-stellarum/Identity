@@ -1,4 +1,4 @@
-package br.api.universum.identity.modules.authentication.model;
+package br.api.universum.identity.domain.model;
 
 import org.junit.jupiter.api.Test;
 
@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class RefreshTokenTest {
 
@@ -18,10 +19,19 @@ class RefreshTokenTest {
     void issueShouldStoreHashAndCreateNonRevokedTokenExpiringAfterValidity() {
         RefreshToken token = RefreshToken.issue("hash-abc", USER_ID, NOW, VALIDITY);
 
+        assertThat(token.getId()).isNull();
         assertThat(token.getTokenHash()).isEqualTo("hash-abc");
         assertThat(token.getUserId()).isEqualTo(USER_ID);
         assertThat(token.getExpiryDate()).isEqualTo(NOW.plus(VALIDITY));
         assertThat(token.isRevoked()).isFalse();
+    }
+
+    @Test
+    void issueShouldRequireHashAndUser() {
+        assertThatThrownBy(() -> RefreshToken.issue(" ", USER_ID, NOW, VALIDITY))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> RefreshToken.issue("hash-abc", null, NOW, VALIDITY))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

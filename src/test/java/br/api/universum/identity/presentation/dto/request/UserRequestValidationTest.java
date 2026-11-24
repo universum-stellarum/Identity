@@ -1,4 +1,4 @@
-package br.api.universum.identity.modules.user.dto.request;
+package br.api.universum.identity.presentation.dto.request;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;

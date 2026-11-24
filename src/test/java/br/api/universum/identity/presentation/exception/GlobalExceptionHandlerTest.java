@@ -1,8 +1,8 @@
-package br.api.universum.identity.core.config.exception;
+package br.api.universum.identity.presentation.exception;
 
-import br.api.universum.identity.shared.exception.BusinessException;
-import br.api.universum.identity.shared.exception.ConflictException;
-import br.api.universum.identity.shared.exception.ResourceNotFoundException;
+import br.api.universum.identity.domain.exception.BusinessException;
+import br.api.universum.identity.domain.exception.ConflictException;
+import br.api.universum.identity.domain.exception.ResourceNotFoundException;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,9 +1,11 @@
-package br.api.universum.identity.modules.authentication;
+package br.api.universum.identity.integration;
 
-import br.api.universum.identity.modules.authentication.service.AuthService;
-import br.api.universum.identity.modules.authentication.dto.request.LoginRequest;
-import br.api.universum.identity.modules.user.model.User;
-import br.api.universum.identity.modules.user.repository.UserRepository;
+import br.api.universum.identity.application.dto.LoginCommand;
+import br.api.universum.identity.application.port.UserRepository;
+import br.api.universum.identity.application.usecase.LoginUseCase;
+import br.api.universum.identity.domain.model.User;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import org.junit.jupiter.api.Test;
@@ -15,23 +17,28 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.RequestBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class IdentityBoundaryIntegrationTest {
+
     @Autowired MockMvc mvc;
     @Autowired UserRepository users;
     @Autowired PasswordEncoder passwords;
-    @Autowired AuthService auth;
+    @Autowired LoginUseCase login;
 
     @Test
     void amIWorkingIsPublicAndIgnoresAStaleAccessToken() throws Exception {
-        for (var request : new org.springframework.test.web.servlet.RequestBuilder[]{
+        for (RequestBuilder request : new RequestBuilder[]{
                 get("/identity/amiworking"), get("/identity/amiworking").header("Authorization", "Bearer expired-access-token")}) {
             mvc.perform(request)
                     .andExpect(status().isOk())
@@ -43,7 +50,7 @@ class IdentityBoundaryIntegrationTest {
     @Test
     void publishesOnlyThePublicKeyAndItVerifiesIssuedAccessTokens() throws Exception {
         var user = users.save(User.register("jwks-boundary@universum.api.br", passwords.encode("secret123"), "JWKS"));
-        var tokens = auth.login(new LoginRequest(user.getEmail(), "secret123"));
+        var tokens = login.execute(new LoginCommand(user.getEmail(), "secret123"));
         var response = mvc.perform(get("/.well-known/jwks.json"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.keys[0].alg").value("RS256"))
@@ -62,14 +69,14 @@ class IdentityBoundaryIntegrationTest {
 
     @Test
     void refreshAndLogoutWorkEvenWithAnInvalidAccessTokenHeader() throws Exception {
-        var user = users.save(User.register("refresh-boundary@universum.api.br", passwords.encode("secret123"), "Refresh"));
-        var login = mvc.perform(post("/identity/api/v1/auth/login")
+        users.save(User.register("refresh-boundary@universum.api.br", passwords.encode("secret123"), "Refresh"));
+        var loginResult = mvc.perform(post("/identity/api/v1/auth/login")
                         .header("Authorization", "Bearer expired-access-token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"email\":\"refresh-boundary@universum.api.br\",\"password\":\"secret123\"}"))
                 .andExpect(status().isOk()).andReturn();
-        var mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-        String refresh = mapper.readTree(login.getResponse().getContentAsString()).get("refreshToken").asText();
+        var mapper = new ObjectMapper();
+        String refresh = mapper.readTree(loginResult.getResponse().getContentAsString()).get("refreshToken").asText();
         var result = mvc.perform(post("/identity/api/v1/auth/refresh")
                         .header("Authorization", "Bearer expired-access-token")
                         .contentType(MediaType.APPLICATION_JSON)

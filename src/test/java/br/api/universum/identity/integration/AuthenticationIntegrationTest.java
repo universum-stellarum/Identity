@@ -1,11 +1,17 @@
-package br.api.universum.identity.modules.authentication;
+package br.api.universum.identity.integration;
 
-import br.api.universum.identity.modules.authentication.dto.request.LoginRequest;
-import br.api.universum.identity.modules.authentication.dto.request.RefreshTokenRequest;
-import br.api.universum.identity.modules.authentication.service.TokenService;
-import br.api.universum.identity.modules.user.dto.request.RegisterUserRequest;
-import br.api.universum.identity.modules.user.dto.request.UpdateUserRequest;
-import br.api.universum.identity.modules.user.model.User;
+import br.api.universum.identity.application.port.AccessTokenIssuer;
+import br.api.universum.identity.application.port.RefreshTokenRepository;
+import br.api.universum.identity.application.port.TokenHasher;
+import br.api.universum.identity.application.port.UserRepository;
+import br.api.universum.identity.application.usecase.RefreshSessionUseCase;
+import br.api.universum.identity.domain.exception.InvalidRefreshTokenException;
+import br.api.universum.identity.domain.model.RefreshToken;
+import br.api.universum.identity.domain.model.User;
+import br.api.universum.identity.presentation.dto.request.LoginRequest;
+import br.api.universum.identity.presentation.dto.request.RefreshTokenRequest;
+import br.api.universum.identity.presentation.dto.request.RegisterUserRequest;
+import br.api.universum.identity.presentation.dto.request.UpdateUserRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,15 +22,30 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -32,14 +53,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class AuthenticationIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private TokenService tokenService;
-
-    @Autowired
-    private br.api.universum.identity.modules.user.repository.UserRepository userRepository;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private AccessTokenIssuer accessTokens;
+    @Autowired private UserRepository users;
+    @Autowired private RefreshTokenRepository refreshTokens;
+    @Autowired private TokenHasher tokenHasher;
+    @Autowired private RefreshSessionUseCase refreshSession;
 
     private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
@@ -48,9 +67,9 @@ class AuthenticationIntegrationTest {
 
     @BeforeEach
     void setUpRegistrarToken() {
-        User registrar = User.register("registrar@universum.api.br", "unused", "Registrar");
-        ReflectionTestUtils.setField(registrar, "id", UUID.randomUUID());
-        registrarAuthHeader = "Bearer " + tokenService.generateAccessToken(registrar);
+        User registrar = User.restore(UUID.randomUUID(), "registrar@universum.api.br", "unused", "Registrar",
+                User.DEFAULT_ROLE, 0, null);
+        registrarAuthHeader = "Bearer " + accessTokens.issue(registrar).value();
     }
 
     @Test
@@ -295,7 +314,7 @@ class AuthenticationIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.detail", is("Missing or malformed request body.")));
 
-        // 2. Non-numeric ID in the path (requires authentication)
+        // 2. Non-UUID ID in the path (requires authentication)
         mockMvc.perform(post("/identity/api/v1/users/register")
                         .header("Authorization", registrarAuthHeader)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -318,56 +337,45 @@ class AuthenticationIntegrationTest {
 
     @Test
     void authenticatedUserCanListUsersAndUpdateOwnProfile() throws Exception {
-        User user = userRepository.save(User.register("regular@universum.api.br", "unused", "Regular"));
-        String auth = "Bearer " + tokenService.generateAccessToken(user);
+        User user = users.save(User.register("regular@universum.api.br", "unused", "Regular"));
+        String auth = "Bearer " + accessTokens.issue(user).value();
         mockMvc.perform(get("/identity/api/v1/users").header("Authorization", auth)).andExpect(status().isOk());
         mockMvc.perform(put("/identity/api/v1/users/me").header("Authorization", auth)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"email\":\"regular@universum.api.br\",\"name\":\"Updated\"}"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"regular@universum.api.br\",\"name\":\"Updated\"}"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.name", is("Updated")));
     }
 
-    @Autowired
-    private br.api.universum.identity.modules.authentication.service.AuthService authService;
-
-    @Autowired
-    private br.api.universum.identity.modules.authentication.repository.RefreshTokenRepository refreshTokenRepository;
-
-    @Autowired
-    private br.api.universum.identity.modules.authentication.service.TokenService tokenService;
-
     @Test
     void onlyOneConcurrentRefreshCanConsumeTheToken() throws Exception {
-        User user = userRepository.save(User.register("concurrent@universum.api.br", "unused", "Concurrent"));
-        refreshTokenRepository.save(br.api.universum.identity.modules.authentication.model.RefreshToken.issue(
-                tokenService.hashRefreshToken("concurrent-refresh"), user.getId(),
-                java.time.Instant.now(), java.time.Duration.ofDays(1)));
-        var start = new java.util.concurrent.CountDownLatch(1);
-        try (var executor = java.util.concurrent.Executors.newFixedThreadPool(2)) {
-            java.util.concurrent.Callable<Boolean> attempt = () -> {
+        User user = users.save(User.register("concurrent@universum.api.br", "unused", "Concurrent"));
+        refreshTokens.save(RefreshToken.issue(
+                tokenHasher.hash("concurrent-refresh"), user.getId(), Instant.now(), Duration.ofDays(1)));
+        var start = new CountDownLatch(1);
+        try (var executor = Executors.newFixedThreadPool(2)) {
+            Callable<Boolean> attempt = () -> {
                 start.await();
                 try {
-                    authService.refresh(new RefreshTokenRequest("concurrent-refresh"));
+                    refreshSession.execute("concurrent-refresh");
                     return true;
-                } catch (br.api.universum.identity.modules.authentication.exception.InvalidRefreshTokenException expected) {
+                } catch (InvalidRefreshTokenException expected) {
                     return false;
                 }
             };
             var first = executor.submit(attempt);
             var second = executor.submit(attempt);
             start.countDown();
-            org.assertj.core.api.Assertions.assertThat(java.util.List.of(
-                    first.get(10, java.util.concurrent.TimeUnit.SECONDS),
-                    second.get(10, java.util.concurrent.TimeUnit.SECONDS))).containsExactlyInAnyOrder(true, false);
+            assertThat(List.of(
+                    first.get(10, TimeUnit.SECONDS),
+                    second.get(10, TimeUnit.SECONDS))).containsExactlyInAnyOrder(true, false);
         }
     }
 
     @Test
     void logoutRevokesRefreshTokenAndIsIdempotent() throws Exception {
-        User user = userRepository.save(User.register("logout@universum.api.br", "unused", "Logout"));
-        refreshTokenRepository.save(br.api.universum.identity.modules.authentication.model.RefreshToken.issue(
-                tokenService.hashRefreshToken("logout-refresh"), user.getId(),
-                java.time.Instant.now(), java.time.Duration.ofDays(1)));
+        User user = users.save(User.register("logout@universum.api.br", "unused", "Logout"));
+        refreshTokens.save(RefreshToken.issue(
+                tokenHasher.hash("logout-refresh"), user.getId(), Instant.now(), Duration.ofDays(1)));
         String body = "{\"refreshToken\":\"logout-refresh\"}";
         for (int i = 0; i < 2; i++) {
             mockMvc.perform(post("/identity/api/v1/auth/logout").contentType(MediaType.APPLICATION_JSON).content(body))

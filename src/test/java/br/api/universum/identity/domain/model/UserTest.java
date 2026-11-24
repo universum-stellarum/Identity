@@ -1,9 +1,10 @@
-package br.api.universum.identity.modules.user.model;
+package br.api.universum.identity.domain.model;
 
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -20,6 +21,7 @@ class UserTest {
     void registerShouldCreateUserWithDefaultRoleAndNoFailedAttempts() {
         User user = newUser();
 
+        assertThat(user.getId()).isNull();
         assertThat(user.getEmail()).isEqualTo("john@universum.api.br");
         assertThat(user.getPassword()).isEqualTo("encoded");
         assertThat(user.getName()).isEqualTo("John");
@@ -37,6 +39,19 @@ class UserTest {
                 .isInstanceOf(IllegalArgumentException.class).hasMessage("Password is required.");
         assertThatThrownBy(() -> User.register("john@universum.api.br", "encoded", ""))
                 .isInstanceOf(IllegalArgumentException.class).hasMessage("Name is required.");
+    }
+
+    @Test
+    void restoreShouldKeepTheStoredState() {
+        UUID id = UUID.randomUUID();
+        Instant lock = NOW.plusSeconds(60);
+
+        User user = User.restore(id, "john@universum.api.br", "encoded", "John", "ROLE_ADMIN", 5, lock);
+
+        assertThat(user.getId()).isEqualTo(id);
+        assertThat(user.getRoles()).isEqualTo("ROLE_ADMIN");
+        assertThat(user.getFailedAttempts()).isEqualTo(5);
+        assertThat(user.isLocked(NOW)).isTrue();
     }
 
     @Test
