@@ -9,6 +9,8 @@ import br.api.universum.identity.application.port.TokenHasher;
 import br.api.universum.identity.domain.model.RefreshToken;
 import br.api.universum.identity.domain.model.User;
 
+import lombok.RequiredArgsConstructor;
+
 import java.time.Clock;
 import java.time.Duration;
 
@@ -16,6 +18,7 @@ import java.time.Duration;
  * Opens a session for an authenticated user: issues the access token and stores a new refresh token.
  * Shared by login and refresh; must run inside the caller's unit of work.
  */
+@RequiredArgsConstructor
 public class SessionIssuer {
 
     public static final Duration REFRESH_TOKEN_VALIDITY = Duration.ofDays(7);
@@ -25,18 +28,6 @@ public class SessionIssuer {
     private final TokenHasher tokenHasher;
     private final RefreshTokenRepository refreshTokens;
     private final Clock clock;
-
-    public SessionIssuer(AccessTokenIssuer accessTokens,
-                         RefreshTokenGenerator refreshTokenGenerator,
-                         TokenHasher tokenHasher,
-                         RefreshTokenRepository refreshTokens,
-                         Clock clock) {
-        this.accessTokens = accessTokens;
-        this.refreshTokenGenerator = refreshTokenGenerator;
-        this.tokenHasher = tokenHasher;
-        this.refreshTokens = refreshTokens;
-        this.clock = clock;
-    }
 
     public AuthenticationResult open(User user) {
         AccessToken accessToken = accessTokens.issue(user);

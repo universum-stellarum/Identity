@@ -5,6 +5,8 @@ import br.api.universum.identity.domain.model.SigningKey;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
@@ -15,13 +17,10 @@ import java.security.Signature;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 final class JwtKeyMaterialFactory {
 
     private final String issuer;
-
-    JwtKeyMaterialFactory(String issuer) {
-        this.issuer = issuer;
-    }
 
     JwtKeyMaterial create(SigningKey stored) {
         try {

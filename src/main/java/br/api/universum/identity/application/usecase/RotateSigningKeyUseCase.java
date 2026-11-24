@@ -9,6 +9,8 @@ import br.api.universum.identity.application.port.UnitOfWork;
 import br.api.universum.identity.domain.event.SigningKeyRotated;
 import br.api.universum.identity.domain.model.SigningKey;
 
+import lombok.RequiredArgsConstructor;
+
 import java.time.Clock;
 import java.util.UUID;
 
@@ -16,6 +18,7 @@ import java.util.UUID;
  * Replaces the active signing key. Every access token signed with the previous key stops being
  * accepted; refresh tokens remain valid, so clients only need to refresh.
  */
+@RequiredArgsConstructor
 public class RotateSigningKeyUseCase {
 
     private final SigningKeyRepository keys;
@@ -23,18 +26,6 @@ public class RotateSigningKeyUseCase {
     private final DomainEventPublisher events;
     private final UnitOfWork unitOfWork;
     private final Clock clock;
-
-    public RotateSigningKeyUseCase(SigningKeyRepository keys,
-                                   SigningKeyGenerator generator,
-                                   DomainEventPublisher events,
-                                   UnitOfWork unitOfWork,
-                                   Clock clock) {
-        this.keys = keys;
-        this.generator = generator;
-        this.events = events;
-        this.unitOfWork = unitOfWork;
-        this.clock = clock;
-    }
 
     public SigningKeyResult execute() {
         return unitOfWork.execute(() -> {

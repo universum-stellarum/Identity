@@ -6,6 +6,7 @@ import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
+import lombok.experimental.UtilityClass;
 
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPublicKey;
@@ -14,12 +15,10 @@ import java.util.Base64;
 import java.util.Map;
 
 /** Builds the JWK Set document (RFC 7517) that publishes the verification key. */
-public final class JwkSetResponse {
+@UtilityClass
+public class JwkSetResponse {
 
-    private JwkSetResponse() {
-    }
-
-    public static Map<String, Object> from(VerificationKey key) {
+    public Map<String, Object> from(VerificationKey key) {
         try {
             RSAPublicKey publicKey = (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(
                     new X509EncodedKeySpec(Base64.getDecoder().decode(key.publicKey())));

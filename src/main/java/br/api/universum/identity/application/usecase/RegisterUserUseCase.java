@@ -8,17 +8,14 @@ import br.api.universum.identity.application.port.UserRepository;
 import br.api.universum.identity.domain.exception.EmailAlreadyInUseException;
 import br.api.universum.identity.domain.model.User;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class RegisterUserUseCase {
 
     private final UserRepository users;
     private final PasswordHasher passwordHasher;
     private final UnitOfWork unitOfWork;
-
-    public RegisterUserUseCase(UserRepository users, PasswordHasher passwordHasher, UnitOfWork unitOfWork) {
-        this.users = users;
-        this.passwordHasher = passwordHasher;
-        this.unitOfWork = unitOfWork;
-    }
 
     public UserResult execute(RegisterUserCommand command) {
         return unitOfWork.execute(() -> {

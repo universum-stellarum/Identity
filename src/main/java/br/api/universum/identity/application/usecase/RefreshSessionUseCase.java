@@ -12,8 +12,8 @@ import br.api.universum.identity.domain.exception.UserNotFoundException;
 import br.api.universum.identity.domain.model.RefreshToken;
 import br.api.universum.identity.domain.model.User;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -22,9 +22,9 @@ import java.time.Instant;
  * Exchanges a valid refresh token for a new token pair, revoking the token used (rotation).
  * Presenting a token that was already rotated revokes every session of the user.
  */
+@Slf4j
+@RequiredArgsConstructor
 public class RefreshSessionUseCase {
-
-    private static final Logger log = LoggerFactory.getLogger(RefreshSessionUseCase.class);
 
     private final UserRepository users;
     private final RefreshTokenRepository refreshTokens;
@@ -32,20 +32,6 @@ public class RefreshSessionUseCase {
     private final SessionIssuer sessions;
     private final UnitOfWork unitOfWork;
     private final Clock clock;
-
-    public RefreshSessionUseCase(UserRepository users,
-                                 RefreshTokenRepository refreshTokens,
-                                 TokenHasher tokenHasher,
-                                 SessionIssuer sessions,
-                                 UnitOfWork unitOfWork,
-                                 Clock clock) {
-        this.users = users;
-        this.refreshTokens = refreshTokens;
-        this.tokenHasher = tokenHasher;
-        this.sessions = sessions;
-        this.unitOfWork = unitOfWork;
-        this.clock = clock;
-    }
 
     // A revogação de todas as sessões em caso de reuso precisa ser persistida, mesmo com a
     // InvalidRefreshTokenException lançada em seguida: a unit of work commita em DomainException.

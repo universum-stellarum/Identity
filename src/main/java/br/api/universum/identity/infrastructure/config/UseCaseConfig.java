@@ -8,9 +8,9 @@ import org.springframework.context.annotation.FilterType;
 import java.time.Clock;
 
 /**
- * Registers the application layer as beans. Use cases and application services are plain Java
- * classes, with no framework annotation: they are picked up here by package and constructed through
- * their single constructor, receiving the adapters that implement their ports.
+ * Registers the application layer as beans. Use cases and application services have no Spring
+ * annotation (only Lombok, which acts at compile time): they are picked up here by package and
+ * constructed through their single constructor, receiving the adapters that implement their ports.
  */
 @Configuration
 @ComponentScan(

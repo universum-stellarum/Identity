@@ -8,18 +8,16 @@ import br.api.universum.identity.domain.exception.EmailAlreadyInUseException;
 import br.api.universum.identity.domain.exception.UserNotFoundException;
 import br.api.universum.identity.domain.model.User;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.UUID;
 
 /** Changes email, name and roles of any user. */
+@RequiredArgsConstructor
 public class UpdateUserUseCase {
 
     private final UserRepository users;
     private final UnitOfWork unitOfWork;
-
-    public UpdateUserUseCase(UserRepository users, UnitOfWork unitOfWork) {
-        this.users = users;
-        this.unitOfWork = unitOfWork;
-    }
 
     public UserResult execute(UUID id, UpdateUserCommand command) {
         return unitOfWork.execute(() -> {
