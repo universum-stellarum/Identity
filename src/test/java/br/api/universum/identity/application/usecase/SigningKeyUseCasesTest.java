@@ -3,10 +3,10 @@ package br.api.universum.identity.application.usecase;
 import br.api.universum.identity.application.ImmediateUnitOfWork;
 import br.api.universum.identity.application.dto.SigningKeyResult;
 import br.api.universum.identity.application.dto.VerificationKey;
-import br.api.universum.identity.application.port.DomainEventPublisher;
-import br.api.universum.identity.application.port.SigningKeyGenerator;
-import br.api.universum.identity.application.port.SigningKeyGenerator.GeneratedKeyPair;
-import br.api.universum.identity.application.port.SigningKeyRepository;
+import br.api.universum.identity.application.port.DomainEventPublisherPort;
+import br.api.universum.identity.application.port.SigningKeyGeneratorPort;
+import br.api.universum.identity.application.port.SigningKeyGeneratorPort.GeneratedKeyPair;
+import br.api.universum.identity.application.port.SigningKeyRepositoryPort;
 import br.api.universum.identity.domain.event.SigningKeyRotated;
 import br.api.universum.identity.domain.model.SigningKey;
 
@@ -36,9 +36,9 @@ class SigningKeyUseCasesTest {
     private final Clock clock = Clock.fixed(NOW, ZoneOffset.UTC);
     private final ImmediateUnitOfWork unitOfWork = new ImmediateUnitOfWork();
 
-    @Mock private SigningKeyRepository keys;
-    @Mock private SigningKeyGenerator generator;
-    @Mock private DomainEventPublisher events;
+    @Mock private SigningKeyRepositoryPort keys;
+    @Mock private SigningKeyGeneratorPort generator;
+    @Mock private DomainEventPublisherPort events;
 
     private static SigningKey activeKey() {
         return SigningKey.restore(UUID.randomUUID(), "public", "private", NOW.minusSeconds(3600));

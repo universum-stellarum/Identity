@@ -1,6 +1,6 @@
 package br.api.universum.identity.infrastructure.security.jwt;
 
-import br.api.universum.identity.application.port.AccessTokenIssuer;
+import br.api.universum.identity.application.port.AccessTokenIssuerPort;
 import br.api.universum.identity.domain.model.User;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +14,7 @@ import java.time.Instant;
 import java.util.List;
 
 @Component
-public class JwtAccessTokenIssuer implements AccessTokenIssuer {
+public class JwtAccessTokenIssuer implements AccessTokenIssuerPort {
 
     public static final long EXPIRES_IN_SECONDS = 900;
 

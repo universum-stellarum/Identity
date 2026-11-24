@@ -42,18 +42,25 @@ infrastructure ┘
 
 - Os modelos do domínio são as próprias entidades JPA, mapeados só com anotações do padrão
   (`jakarta.persistence`): nada de Hibernate ou Spring Data no domínio. `created_at`/`updated_at`
-  são preenchidos por `@PrePersist`/`@PreUpdate`. Os repositórios Spring Data ficam na
-  infraestrutura, atrás dos ports da aplicação.
-- Os casos de uso não têm anotações. O `UseCaseConfig` os registra pelo pacote, e cada um recebe
-  pelo construtor os adapters dos seus ports.
-- A transação é o port `UnitOfWork`. Uma `DomainException` **commita** o que o caso de uso já
+  são preenchidos por `@PrePersist`/`@PreUpdate`.
+- Os ports são interfaces com o sufixo `Port` (`UserRepositoryPort`, `PasswordHasherPort`...), e as
+  implementações levam a tecnologia no nome (`UserJpaRepository`, `BCryptPasswordHasher`...).
+- Não há adapter entre o Spring Data e a aplicação: cada repositório Spring Data (`*JpaRepository`)
+  estende o port e o implementa diretamente. Métodos com a mesma assinatura do `JpaRepository`
+  (`findById`, `save`, `delete`) e consultas derivadas do nome são gerados pelo Spring; bloqueios e
+  consultas explícitas são redeclarados no repositório; o que o Spring não deriva (paginação com
+  `PageQuery`) é um método `default`.
+- Os casos de uso não têm anotações do Spring. O `UseCaseConfig` os registra pelo pacote, e cada um
+  recebe pelo construtor as implementações dos seus ports.
+- A transação é o port `UnitOfWorkPort`. Uma `DomainException` **commita** o que o caso de uso já
   gravou e depois é relançada: login com senha errada mantém o contador de tentativas e reuso de
   refresh token mantém a revogação das sessões. Qualquer outra exceção faz rollback.
 - Lombok é usado em todas as camadas, inclusive no domínio (`@Getter` e construtor privado; sem
   `@Setter`/`@Data`, para que o estado só mude pelos métodos de negócio). Como atua só na
   compilação, não cria dependência em tempo de execução.
-- O `ArchitectureTest` (ArchUnit) quebra o build se alguma dependência apontar para fora, ou se o
-  domínio ou a aplicação passarem a depender de framework.
+- O `ArchitectureTest` (ArchUnit) quebra o build se alguma dependência apontar para fora, se a
+  aplicação depender de framework, se o domínio depender de algo além de `jakarta.persistence` e
+  Lombok, ou se a convenção do sufixo `Port` for quebrada.
 
 ## Endpoints
 

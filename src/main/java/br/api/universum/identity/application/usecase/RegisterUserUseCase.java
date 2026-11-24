@@ -2,9 +2,9 @@ package br.api.universum.identity.application.usecase;
 
 import br.api.universum.identity.application.dto.RegisterUserCommand;
 import br.api.universum.identity.application.dto.UserResult;
-import br.api.universum.identity.application.port.PasswordHasher;
-import br.api.universum.identity.application.port.UnitOfWork;
-import br.api.universum.identity.application.port.UserRepository;
+import br.api.universum.identity.application.port.PasswordHasherPort;
+import br.api.universum.identity.application.port.UnitOfWorkPort;
+import br.api.universum.identity.application.port.UserRepositoryPort;
 import br.api.universum.identity.domain.exception.EmailAlreadyInUseException;
 import br.api.universum.identity.domain.model.User;
 
@@ -13,9 +13,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RegisterUserUseCase {
 
-    private final UserRepository users;
-    private final PasswordHasher passwordHasher;
-    private final UnitOfWork unitOfWork;
+    private final UserRepositoryPort users;
+    private final PasswordHasherPort passwordHasher;
+    private final UnitOfWorkPort unitOfWork;
 
     public UserResult execute(RegisterUserCommand command) {
         return unitOfWork.execute(() -> {

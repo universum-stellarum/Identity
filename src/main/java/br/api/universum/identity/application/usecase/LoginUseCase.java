@@ -2,10 +2,10 @@ package br.api.universum.identity.application.usecase;
 
 import br.api.universum.identity.application.dto.AuthenticationResult;
 import br.api.universum.identity.application.dto.LoginCommand;
-import br.api.universum.identity.application.port.PasswordHasher;
-import br.api.universum.identity.application.port.RefreshTokenRepository;
-import br.api.universum.identity.application.port.UnitOfWork;
-import br.api.universum.identity.application.port.UserRepository;
+import br.api.universum.identity.application.port.PasswordHasherPort;
+import br.api.universum.identity.application.port.RefreshTokenRepositoryPort;
+import br.api.universum.identity.application.port.UnitOfWorkPort;
+import br.api.universum.identity.application.port.UserRepositoryPort;
 import br.api.universum.identity.application.service.SessionIssuer;
 import br.api.universum.identity.domain.exception.InvalidCredentialsException;
 import br.api.universum.identity.domain.exception.UserBlockedException;
@@ -25,11 +25,11 @@ import java.time.Instant;
 @RequiredArgsConstructor
 public class LoginUseCase {
 
-    private final UserRepository users;
-    private final RefreshTokenRepository refreshTokens;
-    private final PasswordHasher passwordHasher;
+    private final UserRepositoryPort users;
+    private final RefreshTokenRepositoryPort refreshTokens;
+    private final PasswordHasherPort passwordHasher;
     private final SessionIssuer sessions;
-    private final UnitOfWork unitOfWork;
+    private final UnitOfWorkPort unitOfWork;
     private final Clock clock;
 
     // A failed attempt is a DomainException: the unit of work still commits the attempt counter.

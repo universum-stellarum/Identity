@@ -1,10 +1,10 @@
 package br.api.universum.identity.application.usecase;
 
 import br.api.universum.identity.application.dto.AuthenticationResult;
-import br.api.universum.identity.application.port.RefreshTokenRepository;
-import br.api.universum.identity.application.port.TokenHasher;
-import br.api.universum.identity.application.port.UnitOfWork;
-import br.api.universum.identity.application.port.UserRepository;
+import br.api.universum.identity.application.port.RefreshTokenRepositoryPort;
+import br.api.universum.identity.application.port.TokenHasherPort;
+import br.api.universum.identity.application.port.UnitOfWorkPort;
+import br.api.universum.identity.application.port.UserRepositoryPort;
 import br.api.universum.identity.application.service.SessionIssuer;
 import br.api.universum.identity.domain.exception.InvalidRefreshTokenException;
 import br.api.universum.identity.domain.exception.UserBlockedException;
@@ -26,11 +26,11 @@ import java.time.Instant;
 @RequiredArgsConstructor
 public class RefreshSessionUseCase {
 
-    private final UserRepository users;
-    private final RefreshTokenRepository refreshTokens;
-    private final TokenHasher tokenHasher;
+    private final UserRepositoryPort users;
+    private final RefreshTokenRepositoryPort refreshTokens;
+    private final TokenHasherPort tokenHasher;
     private final SessionIssuer sessions;
-    private final UnitOfWork unitOfWork;
+    private final UnitOfWorkPort unitOfWork;
     private final Clock clock;
 
     // A revogação de todas as sessões em caso de reuso precisa ser persistida, mesmo com a

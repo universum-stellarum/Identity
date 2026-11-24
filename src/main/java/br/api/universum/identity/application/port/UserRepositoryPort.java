@@ -7,7 +7,7 @@ import br.api.universum.identity.domain.model.User;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserRepository {
+public interface UserRepositoryPort {
 
     Optional<User> findById(UUID id);
 
@@ -17,8 +17,8 @@ public interface UserRepository {
 
     PageResult<User> findAll(PageQuery query);
 
-    /** Inserts a new user (no id yet) or updates an existing one. Returns the stored state, with the id. */
-    User save(User user);
+    /** Insere um usuário novo (ainda sem id) ou atualiza um existente. Devolve o estado gravado, com o id. */
+    <S extends User> S save(S user);
 
     void delete(User user);
 }

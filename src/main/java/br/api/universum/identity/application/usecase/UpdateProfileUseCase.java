@@ -2,8 +2,8 @@ package br.api.universum.identity.application.usecase;
 
 import br.api.universum.identity.application.dto.UpdateProfileCommand;
 import br.api.universum.identity.application.dto.UserResult;
-import br.api.universum.identity.application.port.UnitOfWork;
-import br.api.universum.identity.application.port.UserRepository;
+import br.api.universum.identity.application.port.UnitOfWorkPort;
+import br.api.universum.identity.application.port.UserRepositoryPort;
 import br.api.universum.identity.domain.exception.EmailAlreadyInUseException;
 import br.api.universum.identity.domain.exception.UserNotFoundException;
 import br.api.universum.identity.domain.model.User;
@@ -16,8 +16,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UpdateProfileUseCase {
 
-    private final UserRepository users;
-    private final UnitOfWork unitOfWork;
+    private final UserRepositoryPort users;
+    private final UnitOfWorkPort unitOfWork;
 
     public UserResult execute(UUID userId, UpdateProfileCommand command) {
         return unitOfWork.execute(() -> {

@@ -1,6 +1,6 @@
 package br.api.universum.identity.infrastructure.security;
 
-import br.api.universum.identity.application.port.PasswordHasher;
+import br.api.universum.identity.application.port.PasswordHasherPort;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class BCryptPasswordHasher implements PasswordHasher {
+public class BCryptPasswordHasher implements PasswordHasherPort {
 
     private final PasswordEncoder passwordEncoder;
 

@@ -1,6 +1,6 @@
 package br.api.universum.identity.infrastructure.event;
 
-import br.api.universum.identity.application.port.DomainEventPublisher;
+import br.api.universum.identity.application.port.DomainEventPublisherPort;
 import br.api.universum.identity.domain.event.DomainEvent;
 
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RequiredArgsConstructor
-public class SpringDomainEventPublisher implements DomainEventPublisher {
+public class SpringDomainEventPublisher implements DomainEventPublisherPort {
 
     private final ApplicationEventPublisher events;
 

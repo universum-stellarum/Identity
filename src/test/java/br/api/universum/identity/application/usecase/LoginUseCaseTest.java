@@ -3,12 +3,12 @@ package br.api.universum.identity.application.usecase;
 import br.api.universum.identity.application.ImmediateUnitOfWork;
 import br.api.universum.identity.application.dto.AuthenticationResult;
 import br.api.universum.identity.application.dto.LoginCommand;
-import br.api.universum.identity.application.port.AccessTokenIssuer;
-import br.api.universum.identity.application.port.AccessTokenIssuer.AccessToken;
-import br.api.universum.identity.application.port.PasswordHasher;
-import br.api.universum.identity.application.port.RefreshTokenGenerator;
-import br.api.universum.identity.application.port.RefreshTokenRepository;
-import br.api.universum.identity.application.port.UserRepository;
+import br.api.universum.identity.application.port.AccessTokenIssuerPort;
+import br.api.universum.identity.application.port.AccessTokenIssuerPort.AccessToken;
+import br.api.universum.identity.application.port.PasswordHasherPort;
+import br.api.universum.identity.application.port.RefreshTokenGeneratorPort;
+import br.api.universum.identity.application.port.RefreshTokenRepositoryPort;
+import br.api.universum.identity.application.port.UserRepositoryPort;
 import br.api.universum.identity.application.service.SessionIssuer;
 import br.api.universum.identity.domain.exception.InvalidCredentialsException;
 import br.api.universum.identity.domain.exception.UserBlockedException;
@@ -44,11 +44,11 @@ class LoginUseCaseTest {
     private static final UUID USER_ID = UUID.randomUUID();
     private static final String EMAIL = "john@universum.api.br";
 
-    @Mock private UserRepository users;
-    @Mock private RefreshTokenRepository refreshTokens;
-    @Mock private PasswordHasher passwordHasher;
-    @Mock private AccessTokenIssuer accessTokens;
-    @Mock private RefreshTokenGenerator refreshTokenGenerator;
+    @Mock private UserRepositoryPort users;
+    @Mock private RefreshTokenRepositoryPort refreshTokens;
+    @Mock private PasswordHasherPort passwordHasher;
+    @Mock private AccessTokenIssuerPort accessTokens;
+    @Mock private RefreshTokenGeneratorPort refreshTokenGenerator;
 
     private LoginUseCase login;
     private User user;

@@ -1,6 +1,6 @@
 package br.api.universum.identity.infrastructure.persistence;
 
-import br.api.universum.identity.application.port.UnitOfWork;
+import br.api.universum.identity.application.port.UnitOfWorkPort;
 import br.api.universum.identity.domain.exception.DomainException;
 
 import org.springframework.stereotype.Component;
@@ -10,14 +10,14 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.util.function.Supplier;
 
 /**
- * {@link UnitOfWork} backed by Spring transactions. Joins the current transaction when there is one.
+ * {@link UnitOfWorkPort} backed by Spring transactions. Joins the current transaction when there is one.
  *
  * <p>A {@link DomainException} is caught inside the transaction, so the transaction commits, and is
  * rethrown afterwards (the equivalent of {@code @Transactional(noRollbackFor = DomainException.class)}).
  * Any other exception rolls back.</p>
  */
 @Component
-public class TransactionalUnitOfWork implements UnitOfWork {
+public class TransactionalUnitOfWork implements UnitOfWorkPort {
 
     private final TransactionTemplate writeTransaction;
     private final TransactionTemplate readTransaction;

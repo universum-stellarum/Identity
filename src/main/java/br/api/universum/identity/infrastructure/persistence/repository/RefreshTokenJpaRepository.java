@@ -1,5 +1,6 @@
 package br.api.universum.identity.infrastructure.persistence.repository;
 
+import br.api.universum.identity.application.port.RefreshTokenRepositoryPort;
 import br.api.universum.identity.domain.model.RefreshToken;
 
 import jakarta.persistence.LockModeType;
@@ -12,11 +13,18 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface RefreshTokenJpaRepository extends JpaRepository<RefreshToken, UUID> {
+/**
+ * Implementa o {@link RefreshTokenRepositoryPort} pelo próprio Spring Data. Os métodos do port são
+ * redeclarados aqui só para receber a consulta e o bloqueio, que são detalhes de JPA.
+ */
+public interface RefreshTokenJpaRepository extends JpaRepository<RefreshToken, UUID>, RefreshTokenRepositoryPort {
 
+    @Override
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<RefreshToken> findByTokenHash(String tokenHash);
+    @Query("SELECT t FROM RefreshToken t WHERE t.tokenHash = :tokenHash")
+    Optional<RefreshToken> findByTokenHashForUpdate(@Param("tokenHash") String tokenHash);
 
+    @Override
     @Modifying(flushAutomatically = true)
     @Query("UPDATE RefreshToken t SET t.revoked = true WHERE t.userId = :userId AND t.revoked = false")
     void revokeAllByUserId(@Param("userId") UUID userId);

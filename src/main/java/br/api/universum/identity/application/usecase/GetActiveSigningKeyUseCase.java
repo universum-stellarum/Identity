@@ -1,7 +1,7 @@
 package br.api.universum.identity.application.usecase;
 
-import br.api.universum.identity.application.port.SigningKeyRepository;
-import br.api.universum.identity.application.port.UnitOfWork;
+import br.api.universum.identity.application.port.SigningKeyRepositoryPort;
+import br.api.universum.identity.application.port.UnitOfWorkPort;
 import br.api.universum.identity.domain.model.SigningKey;
 
 import lombok.RequiredArgsConstructor;
@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class GetActiveSigningKeyUseCase {
 
-    private final SigningKeyRepository keys;
-    private final UnitOfWork unitOfWork;
+    private final SigningKeyRepositoryPort keys;
+    private final UnitOfWorkPort unitOfWork;
 
     public SigningKey execute() {
         return unitOfWork.read(() -> keys.findActive().orElseThrow(

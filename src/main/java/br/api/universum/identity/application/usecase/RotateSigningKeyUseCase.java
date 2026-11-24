@@ -1,11 +1,11 @@
 package br.api.universum.identity.application.usecase;
 
 import br.api.universum.identity.application.dto.SigningKeyResult;
-import br.api.universum.identity.application.port.DomainEventPublisher;
-import br.api.universum.identity.application.port.SigningKeyGenerator;
-import br.api.universum.identity.application.port.SigningKeyGenerator.GeneratedKeyPair;
-import br.api.universum.identity.application.port.SigningKeyRepository;
-import br.api.universum.identity.application.port.UnitOfWork;
+import br.api.universum.identity.application.port.DomainEventPublisherPort;
+import br.api.universum.identity.application.port.SigningKeyGeneratorPort;
+import br.api.universum.identity.application.port.SigningKeyGeneratorPort.GeneratedKeyPair;
+import br.api.universum.identity.application.port.SigningKeyRepositoryPort;
+import br.api.universum.identity.application.port.UnitOfWorkPort;
 import br.api.universum.identity.domain.event.SigningKeyRotated;
 import br.api.universum.identity.domain.model.SigningKey;
 
@@ -21,10 +21,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RotateSigningKeyUseCase {
 
-    private final SigningKeyRepository keys;
-    private final SigningKeyGenerator generator;
-    private final DomainEventPublisher events;
-    private final UnitOfWork unitOfWork;
+    private final SigningKeyRepositoryPort keys;
+    private final SigningKeyGeneratorPort generator;
+    private final DomainEventPublisherPort events;
+    private final UnitOfWorkPort unitOfWork;
     private final Clock clock;
 
     public SigningKeyResult execute() {

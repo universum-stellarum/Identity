@@ -1,6 +1,6 @@
 package br.api.universum.identity.application.port;
 
-public interface PasswordHasher {
+public interface PasswordHasherPort {
 
     String hash(String rawPassword);
 

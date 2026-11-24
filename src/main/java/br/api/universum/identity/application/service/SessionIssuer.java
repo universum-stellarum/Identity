@@ -1,11 +1,11 @@
 package br.api.universum.identity.application.service;
 
 import br.api.universum.identity.application.dto.AuthenticationResult;
-import br.api.universum.identity.application.port.AccessTokenIssuer;
-import br.api.universum.identity.application.port.AccessTokenIssuer.AccessToken;
-import br.api.universum.identity.application.port.RefreshTokenGenerator;
-import br.api.universum.identity.application.port.RefreshTokenRepository;
-import br.api.universum.identity.application.port.TokenHasher;
+import br.api.universum.identity.application.port.AccessTokenIssuerPort;
+import br.api.universum.identity.application.port.AccessTokenIssuerPort.AccessToken;
+import br.api.universum.identity.application.port.RefreshTokenGeneratorPort;
+import br.api.universum.identity.application.port.RefreshTokenRepositoryPort;
+import br.api.universum.identity.application.port.TokenHasherPort;
 import br.api.universum.identity.domain.model.RefreshToken;
 import br.api.universum.identity.domain.model.User;
 
@@ -23,10 +23,10 @@ public class SessionIssuer {
 
     public static final Duration REFRESH_TOKEN_VALIDITY = Duration.ofDays(7);
 
-    private final AccessTokenIssuer accessTokens;
-    private final RefreshTokenGenerator refreshTokenGenerator;
-    private final TokenHasher tokenHasher;
-    private final RefreshTokenRepository refreshTokens;
+    private final AccessTokenIssuerPort accessTokens;
+    private final RefreshTokenGeneratorPort refreshTokenGenerator;
+    private final TokenHasherPort tokenHasher;
+    private final RefreshTokenRepositoryPort refreshTokens;
     private final Clock clock;
 
     public AuthenticationResult open(User user) {

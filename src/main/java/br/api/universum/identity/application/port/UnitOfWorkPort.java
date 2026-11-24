@@ -11,7 +11,7 @@ import java.util.function.Supplier;
  * attempt counter, and reusing a revoked refresh token keeps the revocation of every session. Any
  * other exception rolls the block back.</p>
  */
-public interface UnitOfWork {
+public interface UnitOfWorkPort {
 
     <T> T execute(Supplier<T> work);
 

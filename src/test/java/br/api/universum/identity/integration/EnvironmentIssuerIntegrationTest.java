@@ -1,7 +1,7 @@
 package br.api.universum.identity.integration;
 
 import br.api.universum.identity.application.dto.LoginCommand;
-import br.api.universum.identity.application.port.UserRepository;
+import br.api.universum.identity.application.port.UserRepositoryPort;
 import br.api.universum.identity.application.usecase.LoginUseCase;
 import br.api.universum.identity.domain.model.User;
 
@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class EnvironmentIssuerIntegrationTest {
 
     @Autowired LoginUseCase login;
-    @Autowired UserRepository users;
+    @Autowired UserRepositoryPort users;
     @Autowired PasswordEncoder passwords;
     @Autowired JwtDecoder decoder;
     @Autowired JwtEncoder encoder;

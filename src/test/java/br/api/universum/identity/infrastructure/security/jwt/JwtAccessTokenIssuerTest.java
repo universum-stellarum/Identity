@@ -1,6 +1,6 @@
 package br.api.universum.identity.infrastructure.security.jwt;
 
-import br.api.universum.identity.application.port.AccessTokenIssuer.AccessToken;
+import br.api.universum.identity.application.port.AccessTokenIssuerPort.AccessToken;
 import br.api.universum.identity.domain.model.User;
 
 import org.junit.jupiter.api.Test;

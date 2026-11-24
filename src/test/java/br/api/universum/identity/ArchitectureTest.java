@@ -79,10 +79,19 @@ class ArchitectureTest {
     }
 
     @Test
-    void portsAreInterfaces() {
+    void portsAreInterfacesNamedWithThePortSuffix() {
         classes().that().resideInAPackage(ROOT + ".application.port..")
                 .and().areTopLevelClasses()
                 .should().beInterfaces()
+                .andShould().haveSimpleNameEndingWith("Port")
+                .check(CLASSES);
+    }
+
+    @Test
+    void onlyPortsUseThePortSuffix() {
+        noClasses().that().resideOutsideOfPackage(ROOT + ".application.port..")
+                .should().haveSimpleNameEndingWith("Port")
+                .because("o sufixo distingue a interface (port) das implementações")
                 .check(CLASSES);
     }
 }

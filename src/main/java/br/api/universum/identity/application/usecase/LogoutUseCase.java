@@ -1,8 +1,8 @@
 package br.api.universum.identity.application.usecase;
 
-import br.api.universum.identity.application.port.RefreshTokenRepository;
-import br.api.universum.identity.application.port.TokenHasher;
-import br.api.universum.identity.application.port.UnitOfWork;
+import br.api.universum.identity.application.port.RefreshTokenRepositoryPort;
+import br.api.universum.identity.application.port.TokenHasherPort;
+import br.api.universum.identity.application.port.UnitOfWorkPort;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,9 +13,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LogoutUseCase {
 
-    private final RefreshTokenRepository refreshTokens;
-    private final TokenHasher tokenHasher;
-    private final UnitOfWork unitOfWork;
+    private final RefreshTokenRepositoryPort refreshTokens;
+    private final TokenHasherPort tokenHasher;
+    private final UnitOfWorkPort unitOfWork;
 
     public void execute(String rawRefreshToken) {
         unitOfWork.run(() -> refreshTokens.findByTokenHashForUpdate(tokenHasher.hash(rawRefreshToken))

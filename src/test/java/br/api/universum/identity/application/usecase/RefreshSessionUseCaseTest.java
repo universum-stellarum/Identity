@@ -2,11 +2,11 @@ package br.api.universum.identity.application.usecase;
 
 import br.api.universum.identity.application.ImmediateUnitOfWork;
 import br.api.universum.identity.application.dto.AuthenticationResult;
-import br.api.universum.identity.application.port.AccessTokenIssuer;
-import br.api.universum.identity.application.port.AccessTokenIssuer.AccessToken;
-import br.api.universum.identity.application.port.RefreshTokenGenerator;
-import br.api.universum.identity.application.port.RefreshTokenRepository;
-import br.api.universum.identity.application.port.UserRepository;
+import br.api.universum.identity.application.port.AccessTokenIssuerPort;
+import br.api.universum.identity.application.port.AccessTokenIssuerPort.AccessToken;
+import br.api.universum.identity.application.port.RefreshTokenGeneratorPort;
+import br.api.universum.identity.application.port.RefreshTokenRepositoryPort;
+import br.api.universum.identity.application.port.UserRepositoryPort;
 import br.api.universum.identity.application.service.SessionIssuer;
 import br.api.universum.identity.domain.exception.InvalidRefreshTokenException;
 import br.api.universum.identity.domain.exception.UserBlockedException;
@@ -44,10 +44,10 @@ class RefreshSessionUseCaseTest {
     private static final Instant NOW = Instant.parse("2026-01-01T10:00:00Z");
     private static final UUID USER_ID = UUID.randomUUID();
 
-    @Mock private UserRepository users;
-    @Mock private RefreshTokenRepository refreshTokens;
-    @Mock private AccessTokenIssuer accessTokens;
-    @Mock private RefreshTokenGenerator refreshTokenGenerator;
+    @Mock private UserRepositoryPort users;
+    @Mock private RefreshTokenRepositoryPort refreshTokens;
+    @Mock private AccessTokenIssuerPort accessTokens;
+    @Mock private RefreshTokenGeneratorPort refreshTokenGenerator;
 
     private RefreshSessionUseCase refresh;
     private User user;

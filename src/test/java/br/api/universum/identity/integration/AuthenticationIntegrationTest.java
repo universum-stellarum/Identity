@@ -1,9 +1,9 @@
 package br.api.universum.identity.integration;
 
-import br.api.universum.identity.application.port.AccessTokenIssuer;
-import br.api.universum.identity.application.port.RefreshTokenRepository;
-import br.api.universum.identity.application.port.TokenHasher;
-import br.api.universum.identity.application.port.UserRepository;
+import br.api.universum.identity.application.port.AccessTokenIssuerPort;
+import br.api.universum.identity.application.port.RefreshTokenRepositoryPort;
+import br.api.universum.identity.application.port.TokenHasherPort;
+import br.api.universum.identity.application.port.UserRepositoryPort;
 import br.api.universum.identity.application.usecase.RefreshSessionUseCase;
 import br.api.universum.identity.domain.exception.InvalidRefreshTokenException;
 import br.api.universum.identity.domain.model.RefreshToken;
@@ -54,10 +54,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AuthenticationIntegrationTest {
 
     @Autowired private MockMvc mockMvc;
-    @Autowired private AccessTokenIssuer accessTokens;
-    @Autowired private UserRepository users;
-    @Autowired private RefreshTokenRepository refreshTokens;
-    @Autowired private TokenHasher tokenHasher;
+    @Autowired private AccessTokenIssuerPort accessTokens;
+    @Autowired private UserRepositoryPort users;
+    @Autowired private RefreshTokenRepositoryPort refreshTokens;
+    @Autowired private TokenHasherPort tokenHasher;
     @Autowired private RefreshSessionUseCase refreshSession;
 
     private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();

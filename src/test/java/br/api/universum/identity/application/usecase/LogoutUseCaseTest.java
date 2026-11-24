@@ -1,7 +1,7 @@
 package br.api.universum.identity.application.usecase;
 
 import br.api.universum.identity.application.ImmediateUnitOfWork;
-import br.api.universum.identity.application.port.RefreshTokenRepository;
+import br.api.universum.identity.application.port.RefreshTokenRepositoryPort;
 import br.api.universum.identity.domain.model.RefreshToken;
 
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class LogoutUseCaseTest {
 
-    @Mock private RefreshTokenRepository refreshTokens;
+    @Mock private RefreshTokenRepositoryPort refreshTokens;
 
     private LogoutUseCase logout() {
         return new LogoutUseCase(refreshTokens, raw -> "hash:" + raw, new ImmediateUnitOfWork());

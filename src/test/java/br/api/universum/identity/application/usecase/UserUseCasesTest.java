@@ -7,9 +7,9 @@ import br.api.universum.identity.application.dto.RegisterUserCommand;
 import br.api.universum.identity.application.dto.UpdateProfileCommand;
 import br.api.universum.identity.application.dto.UpdateUserCommand;
 import br.api.universum.identity.application.dto.UserResult;
-import br.api.universum.identity.application.port.PasswordHasher;
-import br.api.universum.identity.application.port.UnitOfWork;
-import br.api.universum.identity.application.port.UserRepository;
+import br.api.universum.identity.application.port.PasswordHasherPort;
+import br.api.universum.identity.application.port.UnitOfWorkPort;
+import br.api.universum.identity.application.port.UserRepositoryPort;
 import br.api.universum.identity.domain.exception.EmailAlreadyInUseException;
 import br.api.universum.identity.domain.exception.UserNotFoundException;
 import br.api.universum.identity.domain.model.User;
@@ -38,10 +38,10 @@ class UserUseCasesTest {
     private static final UUID USER_ID = UUID.randomUUID();
     private static final UUID NON_EXISTENT_ID = UUID.randomUUID();
 
-    private final UnitOfWork unitOfWork = new ImmediateUnitOfWork();
+    private final UnitOfWorkPort unitOfWork = new ImmediateUnitOfWork();
 
-    @Mock private UserRepository users;
-    @Mock private PasswordHasher passwordHasher;
+    @Mock private UserRepositoryPort users;
+    @Mock private PasswordHasherPort passwordHasher;
 
     private static User existingUser() {
         return User.restore(USER_ID, "john@universum.api.br", "encoded", "John", User.DEFAULT_ROLE, 0, null);

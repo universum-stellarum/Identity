@@ -1,8 +1,8 @@
 package br.api.universum.identity.integration;
 
 import br.api.universum.identity.application.dto.LoginCommand;
-import br.api.universum.identity.application.port.SigningKeyRepository;
-import br.api.universum.identity.application.port.UserRepository;
+import br.api.universum.identity.application.port.SigningKeyRepositoryPort;
+import br.api.universum.identity.application.port.UserRepositoryPort;
 import br.api.universum.identity.application.usecase.InitializeSigningKeyUseCase;
 import br.api.universum.identity.application.usecase.LoginUseCase;
 import br.api.universum.identity.application.usecase.RefreshSessionUseCase;
@@ -45,10 +45,10 @@ class JwtKeyIntegrationTest {
 
     @Autowired InitializeSigningKeyUseCase initializeKey;
     @Autowired RotateSigningKeyUseCase rotateKey;
-    @Autowired SigningKeyRepository keys;
+    @Autowired SigningKeyRepositoryPort keys;
     @Autowired JdbcTemplate jdbc;
     @Autowired MockMvc mvc;
-    @Autowired UserRepository users;
+    @Autowired UserRepositoryPort users;
     @Autowired LoginUseCase login;
     @Autowired RefreshSessionUseCase refreshSession;
     @Autowired PasswordEncoder passwords;

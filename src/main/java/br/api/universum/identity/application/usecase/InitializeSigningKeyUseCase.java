@@ -1,9 +1,9 @@
 package br.api.universum.identity.application.usecase;
 
-import br.api.universum.identity.application.port.SigningKeyGenerator;
-import br.api.universum.identity.application.port.SigningKeyGenerator.GeneratedKeyPair;
-import br.api.universum.identity.application.port.SigningKeyRepository;
-import br.api.universum.identity.application.port.UnitOfWork;
+import br.api.universum.identity.application.port.SigningKeyGeneratorPort;
+import br.api.universum.identity.application.port.SigningKeyGeneratorPort.GeneratedKeyPair;
+import br.api.universum.identity.application.port.SigningKeyRepositoryPort;
+import br.api.universum.identity.application.port.UnitOfWorkPort;
 import br.api.universum.identity.domain.model.SigningKey;
 
 import lombok.RequiredArgsConstructor;
@@ -18,9 +18,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class InitializeSigningKeyUseCase {
 
-    private final SigningKeyRepository keys;
-    private final SigningKeyGenerator generator;
-    private final UnitOfWork unitOfWork;
+    private final SigningKeyRepositoryPort keys;
+    private final SigningKeyGeneratorPort generator;
+    private final UnitOfWorkPort unitOfWork;
     private final Clock clock;
 
     public SigningKey execute() {

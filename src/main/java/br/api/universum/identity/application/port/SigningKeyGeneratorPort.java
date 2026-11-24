@@ -1,7 +1,7 @@
 package br.api.universum.identity.application.port;
 
 /** Generates a new RSA key pair for signing access tokens. */
-public interface SigningKeyGenerator {
+public interface SigningKeyGeneratorPort {
 
     GeneratedKeyPair generate();
 
