@@ -1,8 +1,8 @@
 package br.api.universum.identity.integration;
 
-import br.api.universum.identity.application.usecases.auth.LoginRequest;
 import br.api.universum.identity.application.abstractions.UserRepository;
 import br.api.universum.identity.application.usecases.auth.LoginUseCase;
+import br.api.universum.identity.application.usecases.auth.request.LoginRequest;
 import br.api.universum.identity.domain.model.User;
 
 import org.junit.jupiter.api.Test;

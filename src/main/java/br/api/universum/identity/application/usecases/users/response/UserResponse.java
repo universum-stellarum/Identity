@@ -1,4 +1,4 @@
-package br.api.universum.identity.application.usecases.users;
+package br.api.universum.identity.application.usecases.users.response;
 
 import br.api.universum.identity.domain.model.User;
 

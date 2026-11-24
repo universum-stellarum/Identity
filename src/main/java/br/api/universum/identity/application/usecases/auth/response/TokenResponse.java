@@ -1,4 +1,4 @@
-package br.api.universum.identity.application.usecases.auth;
+package br.api.universum.identity.application.usecases.auth.response;
 
 /** O par de tokens entregue ao cliente após o login ou o refresh. */
 public record TokenResponse(

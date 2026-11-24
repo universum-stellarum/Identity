@@ -3,6 +3,8 @@ package br.api.universum.identity.application.usecases.auth;
 import br.api.universum.identity.application.abstractions.RefreshTokenRepository;
 import br.api.universum.identity.application.abstractions.TokenHasher;
 import br.api.universum.identity.application.abstractions.UserRepository;
+import br.api.universum.identity.application.usecases.auth.request.RefreshTokenRequest;
+import br.api.universum.identity.application.usecases.auth.response.TokenResponse;
 import br.api.universum.identity.domain.exception.BusinessException;
 import br.api.universum.identity.domain.exception.InvalidRefreshTokenException;
 import br.api.universum.identity.domain.exception.UserBlockedException;

@@ -2,6 +2,7 @@ package br.api.universum.identity.application.usecases.auth;
 
 import br.api.universum.identity.application.abstractions.RefreshTokenRepository;
 import br.api.universum.identity.application.abstractions.TokenHasher;
+import br.api.universum.identity.application.usecases.auth.request.RefreshTokenRequest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

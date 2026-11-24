@@ -5,13 +5,13 @@ import br.api.universum.identity.application.abstractions.RefreshTokenRepository
 import br.api.universum.identity.application.abstractions.TokenHasher;
 import br.api.universum.identity.application.abstractions.UserRepository;
 import br.api.universum.identity.application.usecases.auth.RefreshSessionUseCase;
+import br.api.universum.identity.application.usecases.auth.request.LoginRequest;
+import br.api.universum.identity.application.usecases.auth.request.RefreshTokenRequest;
+import br.api.universum.identity.application.usecases.users.request.RegisterUserRequest;
+import br.api.universum.identity.application.usecases.users.request.UpdateUserRequest;
 import br.api.universum.identity.domain.exception.InvalidRefreshTokenException;
 import br.api.universum.identity.domain.model.RefreshToken;
 import br.api.universum.identity.domain.model.User;
-import br.api.universum.identity.application.usecases.auth.LoginRequest;
-import br.api.universum.identity.application.usecases.auth.RefreshTokenRequest;
-import br.api.universum.identity.application.usecases.users.RegisterUserRequest;
-import br.api.universum.identity.application.usecases.users.UpdateUserRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;

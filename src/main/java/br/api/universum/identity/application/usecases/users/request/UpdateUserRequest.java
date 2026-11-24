@@ -1,4 +1,4 @@
-package br.api.universum.identity.application.usecases.users;
+package br.api.universum.identity.application.usecases.users.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

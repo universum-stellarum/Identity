@@ -1,6 +1,7 @@
 package br.api.universum.identity.application.usecases.keys;
 
 import br.api.universum.identity.application.abstractions.SigningKeyRepository;
+import br.api.universum.identity.application.usecases.keys.response.VerificationKeyResponse;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

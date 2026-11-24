@@ -1,10 +1,11 @@
 package br.api.universum.identity.application.usecases.auth;
 
-import br.api.universum.identity.application.abstractions.AccessTokenIssuer;
 import br.api.universum.identity.application.abstractions.AccessTokenIssuer.AccessToken;
+import br.api.universum.identity.application.abstractions.AccessTokenIssuer;
 import br.api.universum.identity.application.abstractions.RefreshTokenGenerator;
 import br.api.universum.identity.application.abstractions.RefreshTokenRepository;
 import br.api.universum.identity.application.abstractions.TokenHasher;
+import br.api.universum.identity.application.usecases.auth.response.TokenResponse;
 import br.api.universum.identity.domain.model.RefreshToken;
 import br.api.universum.identity.domain.model.User;
 

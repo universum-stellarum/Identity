@@ -1,6 +1,8 @@
 package br.api.universum.identity.application.usecases.users;
 
 import br.api.universum.identity.application.abstractions.UserRepository;
+import br.api.universum.identity.application.usecases.users.request.RegisterUserRequest;
+import br.api.universum.identity.application.usecases.users.response.UserResponse;
 import br.api.universum.identity.domain.exception.EmailAlreadyInUseException;
 import br.api.universum.identity.domain.model.User;
 

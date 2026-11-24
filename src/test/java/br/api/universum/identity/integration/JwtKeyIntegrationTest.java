@@ -1,12 +1,12 @@
 package br.api.universum.identity.integration;
 
-import br.api.universum.identity.application.usecases.auth.LoginRequest;
 import br.api.universum.identity.application.abstractions.SigningKeyRepository;
 import br.api.universum.identity.application.abstractions.UserRepository;
-import br.api.universum.identity.application.usecases.keys.InitializeSigningKeyUseCase;
 import br.api.universum.identity.application.usecases.auth.LoginUseCase;
 import br.api.universum.identity.application.usecases.auth.RefreshSessionUseCase;
-import br.api.universum.identity.application.usecases.auth.RefreshTokenRequest;
+import br.api.universum.identity.application.usecases.auth.request.LoginRequest;
+import br.api.universum.identity.application.usecases.auth.request.RefreshTokenRequest;
+import br.api.universum.identity.application.usecases.keys.InitializeSigningKeyUseCase;
 import br.api.universum.identity.application.usecases.keys.RotateSigningKeyUseCase;
 import br.api.universum.identity.domain.model.SigningKey;
 import br.api.universum.identity.domain.model.User;

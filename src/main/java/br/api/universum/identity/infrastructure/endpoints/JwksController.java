@@ -1,7 +1,7 @@
 package br.api.universum.identity.infrastructure.endpoints;
 
 import br.api.universum.identity.application.usecases.keys.GetVerificationKeyUseCase;
-import br.api.universum.identity.application.usecases.keys.VerificationKeyResponse;
+import br.api.universum.identity.application.usecases.keys.response.VerificationKeyResponse;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWKSet;

@@ -1,4 +1,4 @@
-package br.api.universum.identity.application.usecases.keys;
+package br.api.universum.identity.application.usecases.keys.response;
 
 import br.api.universum.identity.domain.model.SigningKey;
 

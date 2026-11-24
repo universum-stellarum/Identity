@@ -6,10 +6,10 @@ import br.api.universum.identity.application.usecases.users.ListUsersUseCase;
 import br.api.universum.identity.application.usecases.users.RegisterUserUseCase;
 import br.api.universum.identity.application.usecases.users.UpdateProfileUseCase;
 import br.api.universum.identity.application.usecases.users.UpdateUserUseCase;
-import br.api.universum.identity.application.usecases.users.RegisterUserRequest;
-import br.api.universum.identity.application.usecases.users.UpdateProfileRequest;
-import br.api.universum.identity.application.usecases.users.UpdateUserRequest;
-import br.api.universum.identity.application.usecases.users.UserResponse;
+import br.api.universum.identity.application.usecases.users.request.RegisterUserRequest;
+import br.api.universum.identity.application.usecases.users.request.UpdateProfileRequest;
+import br.api.universum.identity.application.usecases.users.request.UpdateUserRequest;
+import br.api.universum.identity.application.usecases.users.response.UserResponse;
 import br.api.universum.identity.infrastructure.web.CurrentUserId;
 
 import io.swagger.v3.oas.annotations.Operation;

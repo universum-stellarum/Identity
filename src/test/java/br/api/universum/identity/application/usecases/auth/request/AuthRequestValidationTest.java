@@ -1,4 +1,4 @@
-package br.api.universum.identity.application.usecases.auth;
+package br.api.universum.identity.application.usecases.auth.request;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;

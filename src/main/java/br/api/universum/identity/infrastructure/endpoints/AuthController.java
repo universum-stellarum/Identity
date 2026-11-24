@@ -3,11 +3,11 @@ package br.api.universum.identity.infrastructure.endpoints;
 import br.api.universum.identity.application.usecases.auth.LoginUseCase;
 import br.api.universum.identity.application.usecases.auth.LogoutUseCase;
 import br.api.universum.identity.application.usecases.auth.RefreshSessionUseCase;
+import br.api.universum.identity.application.usecases.auth.request.LoginRequest;
+import br.api.universum.identity.application.usecases.auth.request.RefreshTokenRequest;
+import br.api.universum.identity.application.usecases.auth.response.TokenResponse;
 import br.api.universum.identity.application.usecases.keys.RotateSigningKeyUseCase;
-import br.api.universum.identity.application.usecases.auth.LoginRequest;
-import br.api.universum.identity.application.usecases.auth.RefreshTokenRequest;
-import br.api.universum.identity.application.usecases.keys.SigningKeyResponse;
-import br.api.universum.identity.application.usecases.auth.TokenResponse;
+import br.api.universum.identity.application.usecases.keys.response.SigningKeyResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

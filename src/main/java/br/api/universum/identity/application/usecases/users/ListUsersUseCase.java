@@ -1,6 +1,7 @@
 package br.api.universum.identity.application.usecases.users;
 
 import br.api.universum.identity.application.abstractions.UserRepository;
+import br.api.universum.identity.application.usecases.users.response.UserResponse;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ public class ListUsersUseCase {
 
     @Transactional(readOnly = true)
     public Page<UserResponse> execute(Pageable pageable) {
-        return users.findAll(pageable).map(UserResponse::from);
+        return users.findAll(pageable)
+                .map(UserResponse::from);
     }
 }

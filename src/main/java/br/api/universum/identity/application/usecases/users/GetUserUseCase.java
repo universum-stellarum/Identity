@@ -1,6 +1,7 @@
 package br.api.universum.identity.application.usecases.users;
 
 import br.api.universum.identity.application.abstractions.UserRepository;
+import br.api.universum.identity.application.usecases.users.response.UserResponse;
 import br.api.universum.identity.domain.exception.UserNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,8 @@ public class GetUserUseCase {
 
     @Transactional(readOnly = true)
     public UserResponse execute(UUID id) {
-        return users.findById(id).map(UserResponse::from).orElseThrow(UserNotFoundException::new);
+        return users.findById(id)
+                .map(UserResponse::from)
+                .orElseThrow(UserNotFoundException::new);
     }
 }
