@@ -16,13 +16,27 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private static final String[] PUBLIC_AUTHENTICATION_POSTS = {
+            "/identity/api/v1/auth/login", "/identity/api/v1/auth/refresh", "/identity/api/v1/auth/logout"
+    };
+
+    private static final String[] PUBLIC_GETS = {
+            "/.well-known/jwks.json", "/health", "/identity/amiworking", "/actuator/health",
+            "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"
+    };
+
+    /**
+     * Public routes live in their own chains, without the JWT resource server: a stale Authorization
+     * header must not turn them into 401 (login, refresh and logout exist precisely to recover from it).
+     */
     @Bean
     @Order(1)
-    public SecurityFilterChain authenticationSecurityFilterChain(HttpSecurity http) {
-        // A stale Authorization header must not prevent login, refresh or logout.
+    public SecurityFilterChain publicSecurityFilterChain(HttpSecurity http) {
         statelessApi(http)
-                .securityMatchers(matchers -> matchers.requestMatchers(HttpMethod.POST,
-                        "/identity/api/v1/auth/login", "/identity/api/v1/auth/refresh", "/identity/api/v1/auth/logout"))
+                .securityMatchers(matchers -> matchers
+                        .requestMatchers(HttpMethod.POST, PUBLIC_AUTHENTICATION_POSTS)
+                        .requestMatchers(HttpMethod.GET, PUBLIC_GETS))
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
         return http.build();
     }
@@ -32,8 +46,6 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         statelessApi(http)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.GET, "/.well-known/jwks.json", "/health", "/identity/amiworking", "/actuator/health",
-                                "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/actuator/**").denyAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
