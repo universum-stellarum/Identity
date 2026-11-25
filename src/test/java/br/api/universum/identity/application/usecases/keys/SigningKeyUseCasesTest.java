@@ -3,16 +3,12 @@ package br.api.universum.identity.application.usecases.keys;
 import br.api.universum.identity.application.abstractions.SigningKeyGenerator.GeneratedKeyPair;
 import br.api.universum.identity.application.abstractions.SigningKeyGenerator;
 import br.api.universum.identity.application.abstractions.SigningKeyRepository;
-import br.api.universum.identity.application.usecases.keys.response.SigningKeyResponse;
-import br.api.universum.identity.application.usecases.keys.response.VerificationKeyResponse;
-import br.api.universum.identity.domain.event.SigningKeyRotated;
 import br.api.universum.identity.domain.model.SigningKey;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -36,16 +32,11 @@ class SigningKeyUseCasesTest {
 
     @Mock private SigningKeyRepository keys;
     @Mock private SigningKeyGenerator generator;
-    @Mock private ApplicationEventPublisher events;
-
-    private static SigningKey activeKey() {
-        return SigningKey.restore(UUID.randomUUID(), "public", "private", NOW.minusSeconds(3600));
-    }
 
     @Test
     void initializeGeneratesTheFirstPair() {
         SigningKey empty = SigningKey.restore(null, null, null, null);
-        when(keys.findForUpdate()).thenReturn(Optional.of(empty));
+        when(keys.find()).thenReturn(Optional.of(empty));
         when(generator.generate()).thenReturn(new GeneratedKeyPair("public", "private"));
 
         SigningKey key = new InitializeSigningKeyUseCase(keys, generator, clock).execute();
@@ -57,9 +48,9 @@ class SigningKeyUseCasesTest {
 
     @Test
     void initializeKeepsAnExistingKey() {
-        SigningKey existing = activeKey();
+        SigningKey existing = SigningKey.restore(UUID.randomUUID(), "public", "private", NOW.minusSeconds(3600));
         UUID keyId = existing.getKeyId();
-        when(keys.findForUpdate()).thenReturn(Optional.of(existing));
+        when(keys.find()).thenReturn(Optional.of(existing));
 
         SigningKey key = new InitializeSigningKeyUseCase(keys, generator, clock).execute();
 
@@ -70,48 +61,10 @@ class SigningKeyUseCasesTest {
 
     @Test
     void initializeFailsWhenTheKeyStorageIsMissing() {
-        when(keys.findForUpdate()).thenReturn(Optional.empty());
+        when(keys.find()).thenReturn(Optional.empty());
         var useCase = new InitializeSigningKeyUseCase(keys, generator, clock);
 
         assertThatThrownBy(useCase::execute).isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("migration V2");
-    }
-
-    @Test
-    void rotateReplacesTheKeyAndAnnouncesIt() {
-        SigningKey existing = activeKey();
-        UUID previous = existing.getKeyId();
-        when(keys.findForUpdate()).thenReturn(Optional.of(existing));
-        when(generator.generate()).thenReturn(new GeneratedKeyPair("new-public", "new-private"));
-
-        SigningKeyResponse response = new RotateSigningKeyUseCase(keys, generator, events, clock).execute();
-
-        assertThat(response.keyId()).isNotEqualTo(previous);
-        assertThat(response.algorithm()).isEqualTo("RS256");
-        assertThat(response.createdAt()).isEqualTo(NOW);
-        assertThat(existing.getPrivateKey()).isEqualTo("new-private");
-        verify(keys).save(existing);
-        verify(events).publishEvent(new SigningKeyRotated(response.keyId()));
-    }
-
-    @Test
-    void verificationKeyCarriesOnlyThePublicHalf() {
-        SigningKey key = activeKey();
-        when(keys.findActive()).thenReturn(Optional.of(key));
-
-        VerificationKeyResponse verification = new GetVerificationKeyUseCase(keys).execute();
-
-        assertThat(verification.keyId()).isEqualTo(key.getKeyId());
-        assertThat(verification.publicKey()).isEqualTo("public");
-        assertThat(verification.algorithm()).isEqualTo("RS256");
-    }
-
-    @Test
-    void activeKeyFailsWhenNotInitialized() {
-        when(keys.findActive()).thenReturn(Optional.empty());
-        var useCase = new GetActiveSigningKeyUseCase(keys);
-
-        assertThatThrownBy(useCase::execute).isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("not initialized");
     }
 }

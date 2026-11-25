@@ -16,13 +16,12 @@ import static br.api.universum.identity.domain.model.Guard.requireNonNull;
 import static br.api.universum.identity.domain.model.Guard.requireText;
 
 /**
- * O par de chaves RSA que assina os access tokens. Existe uma única chave ativa: rotacioná-la
- * substitui o par e invalida os access tokens assinados com o anterior.
+ * O par de chaves RSA que assina os access tokens. É gerado uma única vez, na primeira subida do
+ * serviço, e nunca é substituído.
  *
  * <p>As chaves ficam codificadas em Base64: a pública em X.509 e a privada em PKCS#8.</p>
  *
- * <p>Fica numa única linha, criada pela migration V2 com todas as colunas da chave vazias, para que o
- * {@code SELECT ... FOR UPDATE} consiga serializar a primeira geração da chave entre as instâncias.</p>
+ * <p>Fica numa única linha, criada vazia pela migration V2 e preenchida na primeira subida.</p>
  */
 @Getter
 @Entity
@@ -70,12 +69,19 @@ public class SigningKey extends BaseEntity<Integer> {
         return keyId != null;
     }
 
-    /** Substitui o par inteiro de uma vez; com entrada inválida, nada muda. */
-    public void rotate(UUID keyId, String publicKey, String privateKey, Instant rotatedAt) {
+    /**
+     * Grava o primeiro par de chaves, todo de uma vez. Com entrada inválida, nada muda.
+     *
+     * @throws IllegalStateException se a chave já foi gerada: ela nunca é substituída
+     */
+    public void initialize(UUID keyId, String publicKey, String privateKey, Instant rotatedAt) {
+        if (isInitialized()) {
+            throw new IllegalStateException("JWT signing key is already initialized.");
+        }
         requireNonNull(keyId, "Key id is required.");
         requireText(publicKey, "Public key is required.");
         requireText(privateKey, "Private key is required.");
-        requireNonNull(rotatedAt, "Rotation instant is required.");
+        requireNonNull(rotatedAt, "Creation instant is required.");
 
         this.keyId = keyId;
         this.publicKey = publicKey;

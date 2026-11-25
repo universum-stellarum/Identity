@@ -35,13 +35,12 @@ infrastructure ──► application ──► domain
 domain/
   model/            User, RefreshToken, SigningKey: entidades JPA (Lombok, Hibernate, auditoria)
   exception/        exceções de negócio
-  event/            SigningKeyRotated
 application/
   abstractions/     interfaces que a aplicação precisa (UserRepository, AccessTokenIssuer, TokenHasher...)
   usecases/
     auth/           login, refresh e logout
     users/          cadastro, consulta, alteração e remoção de usuários
-    keys/           geração, consulta e rotação da chave de assinatura
+    keys/           geração da chave de assinatura na primeira subida
       request/      entrada dos casos de uso do assunto (com Bean Validation)
       response/     saída dos casos de uso do assunto
 infrastructure/
@@ -83,7 +82,6 @@ infrastructure/
 | `PUT` | `/identity/api/v1/users/me` | autenticado | Atualiza o próprio usuário |
 | `GET` | `/identity/api/v1/users` | autenticado | Lista usuários |
 | `GET` / `PUT` / `DELETE` | `/identity/api/v1/users/{id}` | autenticado | Consulta, altera ou remove um usuário |
-| `POST` | `/identity/api/v1/auth/keys` | autenticado | Gerenciamento de chaves de assinatura |
 | `GET` | `/health` | público | Health check |
 
 ## Tokens
@@ -95,6 +93,10 @@ infrastructure/
 - **Reuso:** apresentar um refresh token já revogado revoga todas as sessões do usuário.
 - **Sessão única:** um novo login revoga os refresh tokens anteriores do mesmo usuário.
 - **Logout:** revoga o refresh token. O access token expira sozinho em até 15 minutos.
+- **Chave de assinatura:** um par RSA de 2048 bits, gerado na primeira subida e guardado na tabela
+  `jwt_signing_key`. As subidas seguintes reaproveitam o mesmo par; ele nunca é trocado pela API.
+  Para gerar outro, apague o conteúdo da linha e reinicie o serviço: todos os access tokens em
+  circulação deixam de valer, e os clientes precisam fazer refresh.
 
 ## Configuração
 

@@ -13,8 +13,8 @@ import java.time.Clock;
 import java.util.UUID;
 
 /**
- * Devolve a chave de assinatura ativa e gera o primeiro par se ainda não houver nenhum. Chamado na
- * inicialização; o bloqueio garante que instâncias subindo ao mesmo tempo fiquem com a mesma chave.
+ * Devolve a chave de assinatura, gerando o par na primeira vez em que o serviço sobe. Depois disso,
+ * a mesma chave é reaproveitada em todas as subidas.
  */
 @Service
 @RequiredArgsConstructor
@@ -26,16 +26,14 @@ public class InitializeSigningKeyUseCase {
 
     @Transactional
     public SigningKey execute() {
-
-        SigningKey key = keys.findForUpdate().orElseThrow(
+        SigningKey key = keys.find().orElseThrow(
                 () -> new IllegalStateException("JWT signing key row is missing. Apply Flyway migration V2.")
         );
 
         if (!key.isInitialized()) {
-
             GeneratedKeyPair pair = generator.generate();
 
-            key.rotate(
+            key.initialize(
                     UUID.randomUUID(),
                     pair.publicKey(),
                     pair.privateKey(),

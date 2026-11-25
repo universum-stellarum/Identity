@@ -7,15 +7,11 @@ import java.util.Optional;
 /** Armazena a chave que assina os access tokens (registro único, veja {@link SigningKey}). */
 public interface SigningKeyRepository {
 
-    /** A chave ativa, ou vazio enquanto nenhum par foi gerado. */
-    Optional<SigningKey> findActive();
-
     /**
-     * Carrega a chave, inicializada ou não, e a bloqueia até o fim da unidade de trabalho. Isso
-     * serializa a inicialização e a rotação entre todas as instâncias do serviço. Vazio quando o
-     * registro da chave não existe (migration ausente).
+     * Carrega o registro da chave, com o par já gerado ou ainda vazio. Vazio quando o próprio
+     * registro não existe (migration V2 ausente).
      */
-    Optional<SigningKey> findForUpdate();
+    Optional<SigningKey> find();
 
     <S extends SigningKey> S save(S key);
 }

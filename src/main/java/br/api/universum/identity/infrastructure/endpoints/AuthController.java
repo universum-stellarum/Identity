@@ -6,8 +6,6 @@ import br.api.universum.identity.application.usecases.auth.RefreshSessionUseCase
 import br.api.universum.identity.application.usecases.auth.request.LoginRequest;
 import br.api.universum.identity.application.usecases.auth.request.RefreshTokenRequest;
 import br.api.universum.identity.application.usecases.auth.response.TokenResponse;
-import br.api.universum.identity.application.usecases.keys.RotateSigningKeyUseCase;
-import br.api.universum.identity.application.usecases.keys.response.SigningKeyResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,8 +19,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Endpoints de autenticação: login, renovação (refresh) e logout, além da rotação da chave que
- * assina os JWT. Só recebe a requisição e delega aos casos de uso.
+ * Endpoints de autenticação: login, renovação (refresh) e logout. Só recebe a requisição e
+ * delega aos casos de uso.
  */
 @RestController
 @RequestMapping("/identity/api/v1/auth")
@@ -33,16 +31,6 @@ public class AuthController {
     private final LoginUseCase login;
     private final RefreshSessionUseCase refreshSession;
     private final LogoutUseCase logout;
-    private final RotateSigningKeyUseCase rotateSigningKey;
-
-    @PostMapping("/keys")
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Gera uma nova chave de assinatura dos JWT",
-            description = "Exige autenticação. Substitui a chave ativa e invalida os access tokens existentes. "
-                    + "Só os metadados da chave são retornados; os refresh tokens continuam válidos.")
-    public SigningKeyResponse generateKeys() {
-        return rotateSigningKey.execute();
-    }
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
