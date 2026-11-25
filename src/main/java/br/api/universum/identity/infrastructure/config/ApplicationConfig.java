@@ -16,6 +16,7 @@ public class ApplicationConfig {
         return Clock.systemUTC();
     }
 
+    /** BCrypt: as senhas são guardadas só como hash, e o login compara a senha digitada com ele. */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

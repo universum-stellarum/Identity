@@ -17,6 +17,7 @@ public class GetVerificationKeyUseCase {
     @Transactional(readOnly = true)
     public VerificationKeyResponse execute() {
         return keys.findActive().map(VerificationKeyResponse::from).orElseThrow(
-                () -> new IllegalStateException("JWT signing key is not initialized. Check Flyway migrations."));
+                () -> new IllegalStateException("JWT signing key is not initialized. Check Flyway migrations.")
+        );
     }
 }

@@ -26,12 +26,22 @@ public class InitializeSigningKeyUseCase {
 
     @Transactional
     public SigningKey execute() {
+
         SigningKey key = keys.findForUpdate().orElseThrow(
-                () -> new IllegalStateException("JWT signing key row is missing. Apply Flyway migration V2."));
+                () -> new IllegalStateException("JWT signing key row is missing. Apply Flyway migration V2.")
+        );
 
         if (!key.isInitialized()) {
+
             GeneratedKeyPair pair = generator.generate();
-            key.rotate(UUID.randomUUID(), pair.publicKey(), pair.privateKey(), clock.instant());
+
+            key.rotate(
+                    UUID.randomUUID(),
+                    pair.publicKey(),
+                    pair.privateKey(),
+                    clock.instant()
+            );
+
             keys.save(key);
         }
         return key;

@@ -9,9 +9,13 @@ import java.util.UUID;
 public record SigningKeyResponse(
         UUID keyId,
         String algorithm,
-        Instant createdAt) {
-
+        Instant createdAt
+) {
     public static SigningKeyResponse from(SigningKey key) {
-        return new SigningKeyResponse(key.getKeyId(), SigningKey.ALGORITHM, key.getRotatedAt());
+        return new SigningKeyResponse(
+                key.getKeyId(),
+                SigningKey.ALGORITHM,
+                key.getRotatedAt()
+        );
     }
 }

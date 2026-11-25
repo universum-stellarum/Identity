@@ -46,6 +46,7 @@ public class JwtKeyProvider {
         this.cached.set(load(initializeKey.execute(), clock.instant().plus(CACHE_TTL)));
     }
 
+    /** Encoder que assina com a chave ativa e coloca o {@code kid} dela no header do token. */
     public JwtEncoder jwtEncoder() {
         return parameters -> {
             CachedKey key = current();
@@ -54,10 +55,12 @@ public class JwtKeyProvider {
         };
     }
 
+    /** Decoder que valida tokens com a chave ativa. */
     public JwtDecoder jwtDecoder() {
         return token -> current().decoder().decode(token);
     }
 
+    /** Descarta o cache desta instância assim que uma rotação é confirmada. */
     @TransactionalEventListener
     public synchronized void onKeyRotated(SigningKeyRotated event) {
         // Executado após o commit: nunca guardar em cache a chave de uma rotação desfeita (rollback).

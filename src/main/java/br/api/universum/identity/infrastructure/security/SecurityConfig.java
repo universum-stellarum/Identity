@@ -11,17 +11,28 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * Segurança HTTP do identity. Login, refresh, logout, JWKS e health são públicos; as demais rotas
+ * exigem um access token válido, conferido com a própria chave do serviço.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     private static final String[] PUBLIC_AUTHENTICATION_POSTS = {
-            "/identity/api/v1/auth/login", "/identity/api/v1/auth/refresh", "/identity/api/v1/auth/logout"
+            "/identity/api/v1/auth/login",
+            "/identity/api/v1/auth/refresh",
+            "/identity/api/v1/auth/logout"
     };
 
     private static final String[] PUBLIC_GETS = {
-            "/.well-known/jwks.json", "/health", "/identity/amiworking", "/actuator/health",
-            "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"
+            "/.well-known/jwks.json",
+            "/health",
+            "/identity/amiworking",
+            "/actuator/health",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
     };
 
     /**
@@ -36,10 +47,17 @@ public class SecurityConfig {
                 .securityMatchers(matchers -> matchers
                         .requestMatchers(HttpMethod.POST, PUBLIC_AUTHENTICATION_POSTS)
                         .requestMatchers(HttpMethod.GET, PUBLIC_GETS))
-                .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
+                .authorizeHttpRequests(
+                        authorize -> authorize.anyRequest().permitAll()
+                );
         return http.build();
     }
 
+    /**
+     * Todo o resto exige {@code Authorization: Bearer <access token>}, validado pelo
+     * {@code JwtDecoder} do {@link br.api.universum.identity.infrastructure.security.jwt.JwtConfig}.
+     * O actuator, fora o health, fica fechado.
+     */
     @Bean
     @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {

@@ -15,6 +15,10 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * Preenche os parâmetros {@link CurrentUserId} com o {@code sub} do JWT da requisição.
+ * Sem usuário autenticado, lança {@link AuthenticationCredentialsNotFoundException}.
+ */
 @Component
 public class CurrentUserIdArgumentResolver implements HandlerMethodArgumentResolver {
 

@@ -13,9 +13,14 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * Monta e assina o access token (JWT RS256). Claims: {@code iss}, {@code aud}, {@code sub} (id do
+ * usuário), {@code iat}, {@code exp}, {@code email}, {@code name} e {@code scope} (roles).
+ */
 @Component
 public class JwtAccessTokenIssuer implements AccessTokenIssuer {
 
+    /** Validade do access token: 15 minutos. */
     public static final long EXPIRES_IN_SECONDS = 900;
 
     private final JwtEncoder jwtEncoder;

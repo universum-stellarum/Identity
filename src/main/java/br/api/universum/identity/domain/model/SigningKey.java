@@ -17,7 +17,7 @@ import static br.api.universum.identity.domain.model.Guard.requireText;
 
 /**
  * O par de chaves RSA que assina os access tokens. Existe uma única chave ativa: rotacioná-la
- * substitui o par e invalida os access token assinado com o anterior.
+ * substitui o par e invalida os access tokens assinados com o anterior.
  *
  * <p>As chaves ficam codificadas em Base64: a pública em X.509 e a privada em PKCS#8.</p>
  *
@@ -50,10 +50,22 @@ public class SigningKey extends BaseEntity<Integer> {
     private Instant rotatedAt;
 
     /** Reconstrói a chave num estado conhecido. Os campos da chave ficam {@code null} enquanto nenhum par foi gerado. */
-    public static SigningKey restore(UUID keyId, String publicKey, String privateKey, Instant rotatedAt) {
-        return new SigningKey(SINGLETON_ID, keyId, publicKey, privateKey, rotatedAt);
+    public static SigningKey restore(
+            UUID keyId,
+            String publicKey,
+            String privateKey,
+            Instant rotatedAt
+    ) {
+        return new SigningKey(
+                SINGLETON_ID,
+                keyId,
+                publicKey,
+                privateKey,
+                rotatedAt
+        );
     }
 
+    /** {@code false} enquanto o primeiro par de chaves ainda não foi gerado. */
     public boolean isInitialized() {
         return keyId != null;
     }

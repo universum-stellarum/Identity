@@ -5,6 +5,7 @@ import br.api.universum.identity.domain.model.RefreshToken;
 import java.util.Optional;
 import java.util.UUID;
 
+/** Armazena os refresh tokens emitidos. Os tokens são localizados sempre pelo hash, nunca pelo valor. */
 public interface RefreshTokenRepository {
 
     /**
@@ -16,5 +17,6 @@ public interface RefreshTokenRepository {
     /** Insere um token novo (ainda sem id) ou atualiza um existente. */
     <S extends RefreshToken> S save(S token);
 
+    /** Revoga todos os refresh tokens do usuário, encerrando todas as sessões dele. */
     void revokeAllByUserId(UUID userId);
 }

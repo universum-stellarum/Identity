@@ -8,6 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
+/** Registra no Spring MVC o resolver da anotação {@link CurrentUserId}. */
 @Configuration
 @RequiredArgsConstructor
 public class CurrentUserWebConfig implements WebMvcConfigurer {

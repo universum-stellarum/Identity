@@ -17,6 +17,7 @@ public class GetActiveSigningKeyUseCase {
     @Transactional(readOnly = true)
     public SigningKey execute() {
         return keys.findActive().orElseThrow(
-                () -> new IllegalStateException("JWT signing key is not initialized. Check Flyway migrations."));
+                () -> new IllegalStateException("JWT signing key is not initialized. Check Flyway migrations.")
+        );
     }
 }

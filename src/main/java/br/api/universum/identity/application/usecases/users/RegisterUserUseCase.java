@@ -21,11 +21,16 @@ public class RegisterUserUseCase {
 
     @Transactional
     public UserResponse execute(RegisterUserRequest request) {
+
         if (users.existsByEmail(request.email())) {
             throw new EmailAlreadyInUseException();
         }
 
-        User user = User.register(request.email(), passwordEncoder.encode(request.password()), request.name());
+        User user = User.register(
+                request.email(),
+                passwordEncoder.encode(request.password()),
+                request.name()
+        );
 
         return UserResponse.from(users.save(user));
     }

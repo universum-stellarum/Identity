@@ -4,6 +4,7 @@ import br.api.universum.identity.domain.model.SigningKey;
 
 import java.util.Optional;
 
+/** Armazena a chave que assina os access tokens (registro único, veja {@link SigningKey}). */
 public interface SigningKeyRepository {
 
     /** A chave ativa, ou vazio enquanto nenhum par foi gerado. */

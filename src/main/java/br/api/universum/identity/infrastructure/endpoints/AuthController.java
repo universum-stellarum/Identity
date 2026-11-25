@@ -20,6 +20,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Endpoints de autenticação: login, renovação (refresh) e logout, além da rotação da chave que
+ * assina os JWT. Só recebe a requisição e delega aos casos de uso.
+ */
 @RestController
 @RequestMapping("/identity/api/v1/auth")
 @RequiredArgsConstructor

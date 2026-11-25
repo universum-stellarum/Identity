@@ -6,7 +6,6 @@ import br.api.universum.identity.application.abstractions.SigningKeyRepository;
 import br.api.universum.identity.application.usecases.keys.response.SigningKeyResponse;
 import br.api.universum.identity.domain.event.SigningKeyRotated;
 import br.api.universum.identity.domain.model.SigningKey;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -34,13 +33,22 @@ public class RotateSigningKeyUseCase {
     @Transactional
     public SigningKeyResponse execute() {
         SigningKey key = keys.findForUpdate().orElseThrow(
-                () -> new IllegalStateException("JWT signing key row is missing. Apply Flyway migration V2."));
+                () -> new IllegalStateException("JWT signing key row is missing. Apply Flyway migration V2.")
+        );
 
         GeneratedKeyPair pair = generator.generate();
-        key.rotate(UUID.randomUUID(), pair.publicKey(), pair.privateKey(), clock.instant());
+
+        key.rotate(
+                UUID.randomUUID(),
+                pair.publicKey(),
+                pair.privateKey(),
+                clock.instant()
+        );
+
         keys.save(key);
 
         events.publishEvent(new SigningKeyRotated(key.getKeyId()));
+
         return SigningKeyResponse.from(key);
     }
 }

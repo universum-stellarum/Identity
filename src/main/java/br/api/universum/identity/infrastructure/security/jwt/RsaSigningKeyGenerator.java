@@ -9,6 +9,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.util.Base64;
 
+/** Gera pares de chaves RSA de 2048 bits, em Base64 (pública em X.509, privada em PKCS#8). */
 @Component
 public class RsaSigningKeyGenerator implements SigningKeyGenerator {
 

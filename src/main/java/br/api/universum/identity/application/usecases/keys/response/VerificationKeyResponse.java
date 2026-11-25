@@ -10,9 +10,16 @@ import java.util.UUID;
  *
  * @param publicKey Base64 da chave pública RSA codificada em X.509
  */
-public record VerificationKeyResponse(UUID keyId, String algorithm, String publicKey) {
-
+public record VerificationKeyResponse(
+        UUID keyId,
+        String algorithm,
+        String publicKey
+) {
     public static VerificationKeyResponse from(SigningKey key) {
-        return new VerificationKeyResponse(key.getKeyId(), SigningKey.ALGORITHM, key.getPublicKey());
+        return new VerificationKeyResponse(
+                key.getKeyId(),
+                SigningKey.ALGORITHM,
+                key.getPublicKey()
+        );
     }
 }

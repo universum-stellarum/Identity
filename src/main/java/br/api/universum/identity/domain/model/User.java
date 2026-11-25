@@ -28,7 +28,9 @@ public class User extends BaseEntity<UUID> {
     public static final int MAX_FAILED_ATTEMPTS = 5;
     public static final Duration LOCK_DURATION = Duration.ofMinutes(15);
 
-    /** Gerado no primeiro save; {@code null} até lá. */
+    /**
+     * Gerado no primeiro save; {@code null} até lá.
+     */
     @Id
     @GeneratedValue
     @UuidGenerator
@@ -64,16 +66,37 @@ public class User extends BaseEntity<UUID> {
         );
     }
 
-    /** Reconstrói um usuário num estado conhecido, como viria do armazenamento. */
-    public static User restore(UUID id, String email, String encodedPassword, String name, String roles,
-                               int failedAttempts, Instant lockExpiredAt) {
-        return new User(id, email, encodedPassword, name, roles, failedAttempts, lockExpiredAt);
+    /**
+     * Reconstrói um usuário num estado conhecido, como viria do armazenamento.
+     */
+    public static User restore(
+            UUID id,
+            String email,
+            String encodedPassword,
+            String name,
+            String roles,
+            int failedAttempts,
+            Instant lockExpiredAt) {
+        return new User(
+                id,
+                email,
+                encodedPassword,
+                name,
+                roles,
+                failedAttempts,
+                lockExpiredAt
+        );
     }
 
+    /** {@code true} enquanto o bloqueio por excesso de tentativas de login não tiver expirado. */
     public boolean isLocked(Instant now) {
         return lockExpiredAt != null && lockExpiredAt.isAfter(now);
     }
 
+    /**
+     * Conta uma senha errada. Ao chegar a {@link #MAX_FAILED_ATTEMPTS}, bloqueia a conta por
+     * {@link #LOCK_DURATION}.
+     */
     public void registerFailedLogin(Instant now) {
         this.failedAttempts++;
 
@@ -82,6 +105,7 @@ public class User extends BaseEntity<UUID> {
         }
     }
 
+    /** Zera o contador de tentativas e remove o bloqueio. */
     public void registerSuccessfulLogin() {
         this.failedAttempts = 0;
         this.lockExpiredAt = null;

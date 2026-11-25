@@ -17,6 +17,10 @@ import java.security.Signature;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
+/**
+ * Converte a chave gravada no banco em encoder e decoder. O decoder valida assinatura,
+ * expiração e emissor ({@code iss}).
+ */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 final class JwtKeyMaterialFactory {
 
@@ -39,6 +43,7 @@ final class JwtKeyMaterialFactory {
         }
     }
 
+    /** Assina um dado de teste com a privada e confere com a pública, para garantir que as duas formam um par. */
     private void validateKeyPair(RSAPublicKey publicKey, RSAPrivateKey privateKey)
             throws GeneralSecurityException {
         Signature signature = Signature.getInstance("SHA256withRSA");

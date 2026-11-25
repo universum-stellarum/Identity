@@ -18,6 +18,10 @@ import java.util.UUID;
 import static br.api.universum.identity.domain.model.Guard.requireNonNull;
 import static br.api.universum.identity.domain.model.Guard.requireText;
 
+/**
+ * Uma sessão aberta no login. O cliente guarda o valor do token; o banco guarda só o hash.
+ * Cada refresh revoga o token usado e emite outro (rotação).
+ */
 @Getter
 @Entity
 @Table(name = "refresh_tokens")
@@ -25,13 +29,17 @@ import static br.api.universum.identity.domain.model.Guard.requireText;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RefreshToken extends BaseEntity<UUID> {
 
-    /** Gerado no primeiro save; {@code null} até lá. */
+    /**
+     * Gerado no primeiro save; {@code null} até lá.
+     */
     @Id
     @GeneratedValue
     @UuidGenerator
     private UUID id;
 
-    /** SHA-256 em hex do refresh token. O valor original nunca é persistido. */
+    /**
+     * SHA-256 em hex do refresh token. O valor original nunca é persistido.
+     */
     @Column(name = "token_hash", nullable = false, unique = true, updatable = false)
     private String tokenHash;
 
@@ -44,7 +52,13 @@ public class RefreshToken extends BaseEntity<UUID> {
     @Column(nullable = false)
     private boolean revoked;
 
-    public static RefreshToken issue(String tokenHash, UUID userId, Instant now, Duration validFor) {
+    /** Cria um token novo, não revogado, que expira em {@code now + validFor}. */
+    public static RefreshToken issue(
+            String tokenHash,
+            UUID userId,
+            Instant now,
+            Duration validFor
+    ) {
         return new RefreshToken(
                 null,
                 requireText(tokenHash, "Token hash is required."),
@@ -54,15 +68,31 @@ public class RefreshToken extends BaseEntity<UUID> {
         );
     }
 
-    /** Reconstrói um token num estado conhecido, como viria do armazenamento. */
-    public static RefreshToken restore(UUID id, String tokenHash, UUID userId, Instant expiryDate, boolean revoked) {
-        return new RefreshToken(id, tokenHash, userId, expiryDate, revoked);
+    /**
+     * Reconstrói um token num estado conhecido, como viria do armazenamento.
+     */
+    public static RefreshToken restore(
+            UUID id,
+            String tokenHash,
+            UUID userId,
+            Instant expiryDate,
+            boolean revoked
+    ) {
+        return new RefreshToken(
+                id,
+                tokenHash,
+                userId,
+                expiryDate,
+                revoked
+        );
     }
 
+    /** {@code true} a partir do instante de expiração, inclusive. */
     public boolean isExpired(Instant now) {
         return !expiryDate.isAfter(now);
     }
 
+    /** Marca o token como usado ou encerrado; ele não pode mais ser trocado por um novo par. */
     public void revoke() {
         this.revoked = true;
     }
